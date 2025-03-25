@@ -35,7 +35,14 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('ok7VcPe3vHEcBRo'), 
         ]);
 
-        PlayerForm::factory(10)->withoutScore()->withoutReceipt()->create();
+        PlayerForm::factory(10)->forWeek('Week1')->withoutScore()->withoutReceipt()->create();
+        PlayerForm::factory(10)->forWeek('Week2')->withoutScore()->withoutReceipt()->create();
+        PlayerForm::factory(10)->forWeek('Week3')->withoutScore()->withoutReceipt()->create();
+        PlayerForm::factory(10)->forWeek('Week4')->withoutScore()->withoutReceipt()->create();
+        PlayerForm::factory(10)->forWeek('Week5')->withoutScore()->withoutReceipt()->create();
+        PlayerForm::factory(10)->forWeek('Week6')->withoutScore()->withoutReceipt()->create();
+        PlayerForm::factory(10)->forWeek('Week7')->withoutScore()->withoutReceipt()->create();
+        PlayerForm::factory(10)->forWeek('Week8')->withoutScore()->withoutReceipt()->create();
         
     }
 }

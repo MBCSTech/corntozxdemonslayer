@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\PlayerForm;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PlayersController extends Controller
 {
@@ -13,7 +12,7 @@ class PlayersController extends Controller
     {
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
-        // $puzzleVersion = $request->input('puzzle_version');
+        $week = $request->input('puzzle_version');
 
         // Build the query
         $query = PlayerForm::query();
@@ -26,9 +25,9 @@ class PlayersController extends Controller
             $query->whereDate('created_at', '<=', Carbon::parse($endDate)->endOfDay());
         }
 
-        // if ($puzzleVersion) {
-        //     $query->where('puzzle_version', $puzzleVersion);
-        // }
+        if ($week) {
+            $query->where('puzzle_version', $week);
+        }
 
         $query->orderBy('created_at', 'desc');
 

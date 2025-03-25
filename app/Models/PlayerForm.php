@@ -15,6 +15,7 @@ class PlayerForm extends Model
         'no_fon',
         'score',
         'resit',
+        'puzzle_version',
     ];
 
     protected $casts = [

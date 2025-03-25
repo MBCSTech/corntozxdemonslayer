@@ -73,27 +73,27 @@
                                 onclick="downloadAllImages()"
                                 class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-500 active:bg-green-600 focus:outline-none focus:border-green-600 focus:ring ring-green-300 disabled:opacity-25 transition ease-in-out duration-150">
                                 {{ __('Download Receipt') }}
-                                {{-- <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" viewBox="0 0 20 20"
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" viewBox="0 0 20 20"
                                     fill="currentColor">
                                     <path fill-rule="evenodd"
                                         d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
                                         clip-rule="evenodd" />
-                                </svg> --}}
+                                </svg>
                             </button>
-                            {{-- <div class="custom-dropdown-content">
-                                <button onclick="downloadAllImages('Puzzle01')" class="dropdown-item">
-                                    {{ __('Puzzle 01') }}
+                            <div class="custom-dropdown-content">
+                                <button onclick="downloadAllImages('Week1')" class="dropdown-item">
+                                    {{ __('Week 1') }}
                                 </button>
-                                <button onclick="downloadAllImages('Puzzle02')" class="dropdown-item">
-                                    {{ __('Puzzle 02') }}
+                                <button onclick="downloadAllImages('Week2')" class="dropdown-item">
+                                    {{ __('Week 2') }}
                                 </button>
-                                <button onclick="downloadAllImages('Puzzle03')" class="dropdown-item">
-                                    {{ __('Puzzle 03') }}
+                                <button onclick="downloadAllImages('Week3')" class="dropdown-item">
+                                    {{ __('Week 3') }}
                                 </button>
-                                <button onclick="downloadAllImages('Puzzle04')" class="dropdown-item">
-                                    {{ __('Puzzle 04') }}
+                                <button onclick="downloadAllImages('Week4')" class="dropdown-item">
+                                    {{ __('Week 4') }}
                                 </button>
-                            </div> --}}
+                            </div>
                         </div>
                         <button onclick="exportToCSV()"
                             class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-500 active:bg-blue-600 focus:outline-none focus:border-blue-600 focus:ring ring-blue-300 disabled:opacity-25 transition ease-in-out duration-150">
@@ -246,131 +246,7 @@
         document.getElementById('filter-form').submit();
     }
 
-    async function downloadAllImages() {
-    // Store the clicked button element
-    const button = event.target;
-    const originalText = button.innerHTML;
-
-    try {
-        // Set loading state
-        button.innerHTML = `
-        <span class="inline-flex items-center">
-            <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="green" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Downloading...
-        </span>`;
-        button.disabled = true;
-
-        const startDate = document.getElementById('start_date').value;
-        const endDate = document.getElementById('end_date').value;
-
-        // Fetch the list of images without puzzle version filter
-        const url = `{{ route('dashboard') }}?start_date=${startDate}&end_date=${endDate}&export=1`;
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error('Failed to fetch data for export');
-        }
-
-        const users = await response.json();
-
-        if (users.length === 0) {
-            throw new Error('No receipts found for the selected date range.');
-        }
-
-        const zip = new JSZip();
-        let processedFiles = 0;
-        const totalFiles = users.filter(user => user.Receipt_Name).length;
-
-        for (const user of users) {
-            if (user.Receipt_Name) {
-                const fileExtension = user.Receipt_Name.split('.').pop().toLowerCase();
-                const fileUrl = `{{ asset('storage') }}/resit/${user.Receipt_Name}`;
-
-                if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension) || fileExtension === 'pdf') {
-                    try {
-                        const fileResponse = await fetch(fileUrl);
-                        if (!fileResponse.ok) continue;
-
-                        const fileBlob = await fileResponse.blob();
-                        const fileName = `${user['User ID']}_resit.${fileExtension}`;
-                        zip.file(fileName, fileBlob);
-
-                        processedFiles++;
-                    } catch (error) {
-                        console.error(`Error processing file for ${user['User ID']}:`, error);
-                    }
-                }
-            }
-        }
-
-        if (processedFiles === 0) {
-            throw new Error('No files were successfully processed');
-        }
-
-        // Generate the current date in ddmmyyyy format
-        const date = new Date();
-        const day = String(date.getDate()).padStart(2, '0');
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const year = date.getFullYear();
-        const formattedDate = `${day}${month}${year}`;
-
-        // Generate the zip file and trigger download
-        const content = await zip.generateAsync({
-            type: "blob"
-        });
-        saveAs(content, `receipts_${formattedDate}.zip`);
-
-        // Show success state briefly
-        button.innerHTML = `
-        <span class="inline-flex items-center text-green-500">
-            <svg class="h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            Downloaded!
-        </span>`;
-
-        // Reset button after 2 seconds
-        setTimeout(() => {
-            button.innerHTML = originalText;
-            button.disabled = false;
-        }, 2000);
-
-    } catch (error) {
-        console.error('Error in downloadAllImages:', error);
-
-        // Show error state briefly
-        button.innerHTML = `
-        <span class="inline-flex items-center text-red-500">
-            <svg class="h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="red">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-            Failed to download
-        </span>`;
-
-        // Show error message to user
-        console.error(error.message || 'An error occurred while downloading the receipts. Please try again.');
-
-        // Reset button after 2 seconds
-        setTimeout(() => {
-            button.innerHTML = originalText;
-            button.disabled = false;
-        }, 2000);
-
-    } finally {
-        // Ensure button is re-enabled even if the timeout hasn't finished
-        setTimeout(() => {
-            if (button.disabled) {
-                button.innerHTML = originalText;
-                button.disabled = false;
-            }
-        }, 5000); // Failsafe timeout
-    }
-}
-
-    // async function downloadAllImages(puzzleVersion) {
+    // async function downloadAllImages() {
     //     // Store the clicked button element
     //     const button = event.target;
     //     const originalText = button.innerHTML;
@@ -390,9 +266,8 @@
     //         const startDate = document.getElementById('start_date').value;
     //         const endDate = document.getElementById('end_date').value;
 
-    //         // Fetch the list of images with puzzle version filter
-    //         const url =
-    //             `{{ route('dashboard') }}?start_date=${startDate}&end_date=${endDate}&puzzle_version=${puzzleVersion}&export=1`;
+    //         // Fetch the list of images without puzzle version filter
+    //         const url = `{{ route('dashboard') }}?start_date=${startDate}&end_date=${endDate}&export=1`;
     //         const response = await fetch(url);
 
     //         if (!response.ok) {
@@ -402,7 +277,7 @@
     //         const users = await response.json();
 
     //         if (users.length === 0) {
-    //             throw new Error('No receipts found for the selected puzzle version and date range.');
+    //             throw new Error('No receipts found for the selected date range.');
     //         }
 
     //         const zip = new JSZip();
@@ -420,7 +295,7 @@
     //                         if (!fileResponse.ok) continue;
 
     //                         const fileBlob = await fileResponse.blob();
-    //                         const fileName = `${user['User ID']}_${puzzleVersion}_resit.${fileExtension}`;
+    //                         const fileName = `${user['User ID']}_resit.${fileExtension}`;
     //                         zip.file(fileName, fileBlob);
 
     //                         processedFiles++;
@@ -442,14 +317,11 @@
     //         const year = date.getFullYear();
     //         const formattedDate = `${day}${month}${year}`;
 
-    //         // Include puzzle version in the filename
-    //         const puzzleVersionFormatted = puzzleVersion.replace(/\s+/g, '_').toLowerCase();
-
     //         // Generate the zip file and trigger download
     //         const content = await zip.generateAsync({
     //             type: "blob"
     //         });
-    //         saveAs(content, `receipts_${puzzleVersionFormatted}_${formattedDate}.zip`);
+    //         saveAs(content, `receipts_${formattedDate}.zip`);
 
     //         // Show success state briefly
     //         button.innerHTML = `
@@ -497,6 +369,134 @@
     //         }, 5000); // Failsafe timeout
     //     }
     // }
+
+    async function downloadAllImages(week) {
+        // Store the clicked button element
+        const button = event.target;
+        const originalText = button.innerHTML;
+
+        try {
+            // Set loading state
+            button.innerHTML = `
+            <span class="inline-flex items-center">
+                <svg class="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="green" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Downloading...
+            </span>`;
+            button.disabled = true;
+
+            const startDate = document.getElementById('start_date').value;
+            const endDate = document.getElementById('end_date').value;
+
+            // Fetch the list of images with puzzle version filter
+            const url =
+                `{{ route('dashboard') }}?start_date=${startDate}&end_date=${endDate}&puzzle_version=${week}&export=1`;
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch data for export');
+            }
+
+            const users = await response.json();
+
+            if (users.length === 0) {
+                throw new Error('No receipts found for the selected puzzle version and date range.');
+            }
+
+            const zip = new JSZip();
+            let processedFiles = 0;
+            const totalFiles = users.filter(user => user.Receipt_Name).length;
+
+            for (const user of users) {
+                if (user.Receipt_Name) {
+                    const fileExtension = user.Receipt_Name.split('.').pop().toLowerCase();
+                    const fileUrl = `{{ asset('storage') }}/resit/${user.Receipt_Name}`;
+
+                    if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension) || fileExtension === 'pdf') {
+                        try {
+                            const fileResponse = await fetch(fileUrl);
+                            if (!fileResponse.ok) continue;
+
+                            const fileBlob = await fileResponse.blob();
+                            const fileName = `${user['User ID']}_${week}_resit.${fileExtension}`;
+                            zip.file(fileName, fileBlob);
+
+                            processedFiles++;
+                        } catch (error) {
+                            console.error(`Error processing file for ${user['User ID']}:`, error);
+                        }
+                    }
+                }
+            }
+
+            if (processedFiles === 0) {
+                throw new Error('No files were successfully processed');
+            }
+
+            // Generate the current date in ddmmyyyy format
+            const date = new Date();
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const formattedDate = `${day}${month}${year}`;
+
+            // Include puzzle version in the filename
+            const weekFormatted = week.replace(/\s+/g, '_').toLowerCase();
+
+            // Generate the zip file and trigger download
+            const content = await zip.generateAsync({
+                type: "blob"
+            });
+            saveAs(content, `receipts_${weekFormatted}_${formattedDate}.zip`);
+
+            // Show success state briefly
+            button.innerHTML = `
+            <span class="inline-flex items-center text-green-500">
+                <svg class="h-4 w-4 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                Downloaded!
+            </span>`;
+
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 2000);
+
+        } catch (error) {
+            console.error('Error in downloadAllImages:', error);
+
+            // Show error state briefly
+            button.innerHTML = `
+            <span class="inline-flex items-center text-red-500">
+                <svg class="h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="red">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Failed to download
+            </span>`;
+
+            // Show error message to user
+            console.error(error.message || 'An error occurred while downloading the receipts. Please try again.');
+
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 2000);
+
+        } finally {
+            // Ensure button is re-enabled even if the timeout hasn't finished
+            setTimeout(() => {
+                if (button.disabled) {
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }
+            }, 5000); // Failsafe timeout
+        }
+    }
 
     function downloadImage(url, filename) {
         fetch(url)

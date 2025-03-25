@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('no_fon', 12);
             $table->integer('score')->nullable();
             $table->string('resit')->nullable();
+            $table->string('week');
             $table->timestamps();
         });
     }
