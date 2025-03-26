@@ -57,10 +57,20 @@
 
             create() {
                 this.add.image(config.width / 2, 400, "background").setDisplaySize(480, 800).setDepth(-1);
-                this.add.image(config.width / 2, 0.75 * config.height, "start-button")
+                const startButton = this.add.image(config.width / 2, 0.75 * config.height, "start-button")
                         .setScale(0.4)
                         .setInteractive()
-                        .on("pointerover", () => {
+
+                this.tweens.add({
+                    targets: startButton,
+                    scale: 0.45,
+                    duration: 800,
+                    yoyo: true,
+                    ease: "Sine.easeInOut",
+                    repeat: -1
+                })
+
+                startButton.on("pointerover", () => {
                             // Change cursor to pointer when hovering
                             this.input.setDefaultCursor('pointer');
                         })
