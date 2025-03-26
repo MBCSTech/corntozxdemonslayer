@@ -10,6 +10,10 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
+Route::get('/game', function () {
+    return view('game');
+})->name('game');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [PlayersController::class, 'show'])->name('dashboard');
