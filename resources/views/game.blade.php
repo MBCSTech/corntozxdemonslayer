@@ -58,19 +58,23 @@
             create() {
                 this.add.image(config.width / 2, 400, "background").setDisplaySize(480, 800).setDepth(-1);
                 this.add.image(config.width / 2, 0.75 * config.height, "start-button")
-                    .setScale(0.4)
-                    .setInteractive()
-                    .on("pointerover", () => {
-                        // Change cursor to pointer when hovering
-                        this.input.setDefaultCursor('pointer');
-                    })
-                    .on("pointerout", () => {
-                        // Revert cursor to default when not hovering
-                        this.input.setDefaultCursor('default');
-                    })
-                    .on("pointerdown", () => {
-                        this.scene.start("GamePlayScene");
-                    });
+                        .setScale(0.4)
+                        .setInteractive()
+                        .on("pointerover", () => {
+                            // Change cursor to pointer when hovering
+                            this.input.setDefaultCursor('pointer');
+                        })
+                        .on("pointerout", () => {
+                            // Revert cursor to default when not hovering
+                            this.input.setDefaultCursor('default');
+                        })
+                        .on("pointerdown", () => {
+                            // Reset cursor to default before changing scene
+                            this.input.setDefaultCursor('default');
+                            
+                            // Then start the new scene
+                            this.scene.start("GamePlayScene");
+                        });
                 this.add.image(config.width / 2, 0.4 * config.height, "samurai-pinko").setScale(0.4);
                 this.add.image(config.width / 2, 0.2 * config.height, "masthead").setScale(0.4);
             }
@@ -91,7 +95,7 @@
                 this.load.image("snack", "assets/snack.png");
                 this.load.image("snack2", "assets/snack2.png");
                 this.load.image("snack3", "assets/snack3.png");
-                this.load.image("bomb", "assets/bomb.png");
+                this.load.image("bomb", "assets/bomb2.png");
                 this.load.audio("slice", "assets/slice.mp3");
                 this.load.audio("explosion", "assets/explosion.mp3");
                 this.load.image("scoreboard", "assets/scoreboard.png");
@@ -301,7 +305,7 @@
                     fruit.setVelocity(Phaser.Math.Between(-100, 100), -
                     500); // Throw higher with more vertical velocity
                 } else {
-                    const bomb = this.bombs.create(x, y, "bomb");
+                    const bomb = this.bombs.create(x, y, "bomb").setScale(0.7);
                     bomb.setVelocity(Phaser.Math.Between(-100, 100), -
                     500); // Throw higher with more vertical velocity
                 }
