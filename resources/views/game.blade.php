@@ -1,4 +1,5 @@
 <x-site-layout>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         /* Remove default margin and padding */
         body,
@@ -56,6 +57,7 @@
                 this.load.image("start-button", "assets/start-button.png");
                 this.load.image("masthead", "assets/masthead.png");
                 this.load.image("samurai-pinko", "assets/samurai-pinko.png");
+                this.load.image("instructions", "assets/instructions.png");
                 this.load.image("mute", "assets/mute.png");
                 this.load.image("unmute", "assets/unmute.png");
 
@@ -65,7 +67,7 @@
 
             create() {
                 this.add
-                    .image(config.width / 2, 400, "background")
+                    .image(config.width / 2, config.height / 2, "background")
                     .setDisplaySize(480, 800)
                     .setDepth(-1);
 
@@ -133,11 +135,17 @@
                             });
                         });
                     });
+
+
+                this.add
+                    .image(config.width / 2, config.height - 5, "instructions")
+                    .setScale(0.17)
+                    .setOrigin(0.5, 1);
             }
 
             createSlashEffect(direction, onComplete) {
                 // Play slash sound
-                this.sound.play("slash");
+                // this.sound.play("slash");
 
                 // Clear any existing graphics
                 this.slashGraphics.clear();
@@ -267,7 +275,7 @@
                 this.load.audio("slice", "assets/slice.mp3");
                 this.load.audio("explosion", "assets/explosion.mp3");
                 this.load.image("scoreboard", "assets/scoreboard.png");
-                this.load.image("timer", "assets/timer.png");
+                this.load.image("timerc", "assets/timerc.png");
             }
 
             create() {
@@ -279,12 +287,12 @@
                 countdown = 60;
                 this.add.image(240, 400, "background").setDisplaySize(480, 800);
 
-                this.add.image(80, 60, "scoreboard").setScale(0.55);
-                this.add.image(440, 60, "timer").setScale(0.55);
+                this.add.image(0.17 * config.width, 0.075 * config.height, "scoreboard").setScale(0.55);
+                this.add.image(0.9 * config.width, 0.08 * config.height, "timerc").setScale(0.25);
 
                 // Score text
                 this.scoreText = this.add
-                    .text(95, 60, "0", {
+                    .text(0.2 * config.width, 0.075 * config.height, "0", {
                         fontFamily: "PoppinsExtraBold",
                         fontSize: "20px",
                         fill: "#fff",
@@ -293,12 +301,13 @@
 
                 // Countdown text
                 this.countdownText = this.add
-                    .text(439, 64, countdown, {
+                    .text(0.86 * config.width, 0.086 * config.height, countdown, {
                         fontFamily: "PoppinsExtraBold",
-                        fontSize: "15px",
+                        fontSize: "18px",
                         fill: "#000",
                     })
-                    .setOrigin(0.5);
+                    .setOrigin(0.5)
+                    .setAngle(-14);
 
                 // Timer for countdown
                 this.time.addEvent({
@@ -468,6 +477,7 @@
                         fruit.destroy();
                         score += 10;
                         this.scoreText.setText(score);
+                        this.sound.play("slice");
                     }
                 });
 
@@ -492,7 +502,7 @@
                         this.cameras.main.once(
                             Phaser.Cameras.Scene2D.Events.SHAKE_COMPLETE,
                             (cam, effect) => {
-                                this.endGame();
+                                this.endGame('bomb'); // Specify 'bomb' as reason
                             }
                         );
                     }
@@ -602,7 +612,7 @@
                 this.countdownText.setText(countdown); // Update the countdown text
 
                 if (countdown <= 0) {
-                    this.endGame(); // End the game when time runs out
+                    this.endGame('timeout'); // Specify 'timeout' as reason (or use default)
                 }
             }
 
@@ -626,7 +636,7 @@
                 this.time.delayedCall(1000, this.spawnObjects, [], this);
             }
 
-            endGame() {
+            endGame(reason = 'timeout') {
                 // Only proceed if we haven't already triggered the end sequence
                 if (this.isGameEnding) return;
                 this.isGameEnding = true;
@@ -639,11 +649,15 @@
                     .setDepth(2000)
                     .setAlpha(0);
 
-                // Create the "MASA TAMAT!" text
-                const endText = this.add.text(240, 400, "MASA TAMAT!", {
+                // Set message based on end reason
+                const message = reason === 'bomb' ? "ADUH! KENA BOM!" : "MASA TAMAT!";
+                const textColor = reason === 'bomb' ? "#FF3030" : "#FF6FAC"; // Red for bomb, pink for timeout
+
+                // Create the end text
+                const endText = this.add.text(240, 400, message, {
                         fontFamily: "PoppinsExtraBold",
-                        fontSize: "48px",
-                        fill: "#FF6FAC", // Pink color to match your slash effect
+                        fontSize: reason === 'bomb' ? "42px" : "48px", // Slightly smaller for longer bomb text
+                        fill: textColor,
                         stroke: "#FFFFFF", // White stroke for better visibility
                         strokeThickness: 6
                     })
@@ -710,9 +724,9 @@
             }
             preload() {
                 this.load.image("endscoreboard", "assets/endscoreboard.png");
+                this.load.image("leaderboard", "assets/leaderboard.png");
                 this.load.image("restart-button", "assets/restart-button.png");
                 this.load.image("proceed-button", "assets/proceed-button.png");
-                this.load.image("instructions", "assets/instructions.png");
             }
 
             create(data) {
@@ -721,7 +735,10 @@
                 // Add pink overlay with 30% opacity
                 const overlay = this.add.rectangle(240, 400, 480, 800, 0xFF69B4, 0.4);
 
+                this.add.image(config.width / 2, 0.12 * config.height, "masthead").setScale(0.45);
                 this.add.image(config.width / 2, 0.35 * config.height, "endscoreboard").setScale(0.25);
+
+                this.add.image(config.width / 2, 0.58 * config.height, "leaderboard").setScale(0.25);
 
                 this.add
                     .text(0.58 * config.width, 0.36 * config.height, data.score, {
@@ -732,22 +749,48 @@
                     .setOrigin(0.5);
 
                 const restartButton = this.add
-                    .image(config.width / 2, 0.52 * config.height, "restart-button")
+                    .image(config.width / 2, 0.82 * config.height, "restart-button")
                     .setScale(0.2)
                     .setInteractive();
 
                 const proceedButton = this.add
-                    .image(config.width / 2, 0.6 * config.height, "proceed-button")
+                    .image(config.width / 2, 0.9 * config.height, "proceed-button")
                     .setScale(0.2)
                     .setInteractive();
 
-                this.add
-                    .image(config.width / 2, 0.7 * config.height, "instructions")
-                    .setScale(0.2)
-                    .setInteractive();
 
                 restartButton.on("pointerdown", () => {
                         this.scene.start("GamePlayScene");
+                    }).on("pointerover", () => {
+                        // Change cursor to pointer when hovering
+                        this.input.setDefaultCursor("pointer");
+                    })
+                    .on("pointerout", () => {
+                        // Revert cursor to default when not hovering
+                        this.input.setDefaultCursor("default");
+                    })
+                    .on("pointerdown", () => {
+                        // Disable button and reset cursor
+                        restartButton.disableInteractive();
+                        this.input.setDefaultCursor("default");
+                    });
+
+                proceedButton.on("pointerdown", () => {
+                        fetch('/save-score', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .getAttribute('content')
+                            },
+                            body: JSON.stringify({
+                                score: data.score
+                            })
+                        }).then(() => {
+                            window.location.href = '/leaderboard';
+                        }).catch(error => {
+                            console.error(error);
+                        });
                     }).on("pointerover", () => {
                         // Change cursor to pointer when hovering
                         this.input.setDefaultCursor("pointer");
