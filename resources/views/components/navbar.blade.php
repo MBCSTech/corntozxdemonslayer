@@ -200,7 +200,7 @@
         </div>
         <ul class="menu-items">
             <li><a href="#"><img class="navbar-icons" src='/assets/img/info-logo.png'/>TENTANG CORNTOZ</a></li>
-            <li><a href="/game"><img class="navbar-icons" src='/assets/img/pen-logo.png'/>MAIN SEKARANG</a></li>
+            <li><a href="#"><img class="navbar-icons" src='/assets/img/pen-logo.png'/>MAIN SEKARANG</a></li>
             <li><a href="#"><img class="navbar-icons" src='/assets/img/file-logo.png'/>TERMA & SYARAT</a></li>
         </ul>
         <img src="/assets/img/navbar-logo.png" class="logo"/>

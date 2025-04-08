@@ -1,28 +1,5 @@
 <x-site-layout>
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <style>
-        /* Remove default margin and padding */
-        body,
-        html {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* background-color: #FF6FAC; */
-        }
-
-        /* Center the game container */
-        #game-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-        }
-    </style>
     <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
     </head>
 
@@ -738,7 +715,8 @@
                 this.add.image(config.width / 2, 0.12 * config.height, "masthead").setScale(0.45);
                 this.add.image(config.width / 2, 0.35 * config.height, "endscoreboard").setScale(0.25);
 
-                this.add.image(config.width / 2, 0.58 * config.height, "leaderboard").setScale(0.25);
+                const leaderboard = this.add.image(config.width / 2, 0.58 * config.height, "leaderboard").setScale(
+                    0.25);
 
                 this.add
                     .text(0.58 * config.width, 0.36 * config.height, data.score, {
@@ -747,6 +725,22 @@
                         fill: "#fff",
                     })
                     .setOrigin(0.5);
+
+                const leaderboardData = [{
+                        name: 'Alex',
+                        score: 1000
+                    },
+                    {
+                        name: 'Brian',
+                        score: 850
+                    },
+                    {
+                        name: 'Taylor',
+                        score: 290
+                    },
+                ]
+
+                this.displayLeaderboard(leaderboard, leaderboardData);
 
                 const restartButton = this.add
                     .image(config.width / 2, 0.82 * config.height, "restart-button")
@@ -787,7 +781,7 @@
                                 score: data.score
                             })
                         }).then(() => {
-                            window.location.href = '/leaderboard';
+                            window.location.href = '/form-submission';
                         }).catch(error => {
                             console.error(error);
                         });
@@ -804,6 +798,48 @@
                         restartButton.disableInteractive();
                         this.input.setDefaultCursor("default");
                     });
+            }
+
+            displayLeaderboard(leaderboard, data) {
+                const leaderboardX = leaderboard.x + 80;
+                const leaderboardY = leaderboard.y;
+                const leaderboardWidth = leaderboard.width * leaderboard.scale;
+                const leaderboardHeight = leaderboard.height * leaderboard.scale;
+
+                // Calculate positions relative to the leaderboard
+                const startY = leaderboardY + leaderboardHeight * 0.08; // Start position for first entry
+                const entryHeight = leaderboardHeight * 0.16; // Height of each entry
+
+                // Sort data by score (highest first)
+                const sortedData = [...data].sort((a, b) => b.score - a.score);
+
+                // Display each entry
+                sortedData.forEach((entry, index) => {
+                    // Calculate position for this entry
+                    const entryY = startY + (index * entryHeight);
+
+                    // Player name (left-aligned)
+                    this.add.text(
+                        leaderboardX - leaderboardWidth * 0.25,
+                        entryY,
+                        `${entry.name}`, {
+                            fontFamily: "PoppinsExtraBold",
+                            fontSize: "20px",
+                            fill: "#000"
+                        }
+                    ).setOrigin(0, 0.5);
+
+                    // Player score (right-aligned)
+                    this.add.text(
+                        leaderboardX + leaderboardWidth * 0.27,
+                        entryY,
+                        entry.score.toString(), {
+                            fontFamily: "PoppinsExtraBold",
+                            fontSize: "20px",
+                            fill: "#000"
+                        }
+                    ).setOrigin(1, 0.5);
+                })
             }
         }
 

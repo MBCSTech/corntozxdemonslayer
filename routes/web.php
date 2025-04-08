@@ -20,9 +20,9 @@ Route::post('/save-score', function (Request $request) {
     return response()->json(['success' => true]);
 });
 
-Route::get('/leaderboard', function () {
+Route::get('/form-submission', function () {
     $score = session('last_game_score', 0);
-    return view('leaderboard', ['score' => $score]);
+    return view('form-submission', ['score' => $score]);
 });
 
 Route::middleware('auth')->group(function () {

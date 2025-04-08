@@ -6,7 +6,7 @@
             @include('layouts.navbar')
 
             <!-- Page Content -->
-            <main class="flex justify-center min-h-screen items-center">
+            <main class="">
                 {{ $slot }}
             </main>
         </div>
