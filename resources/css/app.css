@@ -3,12 +3,17 @@
 @tailwind utilities;
 
 @font-face {
-    font-family: 'quatro-bold';
-    src: url(../fonts/Quatro-Bold.woff);
+    font-family: 'Poppins';
+    src: url(../fonts/Poppins-Regular.ttf);
+}
+
+@font-face {
+    font-family: 'PoppinsExtraBold';
+    src: url(../fonts/Poppins-ExtraBold.ttf);
 }
 
 * {
-    font-family: "quatro-bold", serif;
+    font-family: "Poppins", serif;
 }
 
 /* ! tailwindcss v3.4.1 | MIT License | https://tailwindcss.com */
