@@ -11,8 +11,8 @@
     font-size: 62.5%;
 }
 
-.navbar input[type="checkbox"],
-.navbar .hamburger-lines{
+.navbars input[type="checkbox"],
+.navbars .hamburger-lines{
     display: none;
 }
 
@@ -22,7 +22,7 @@
     margin: auto;
 }
 
-.navbar{
+.navbars{
     position: fixed;
     width: 100%;
     background: #E94A93;
@@ -58,7 +58,7 @@
     border-radius: 20px;
 }
 
-.navbar a{
+.navbars a{
     color: #FFFFFF;
     text-decoration: none;
     font-weight: 500;
@@ -133,7 +133,7 @@
         transition: transform 0.3s ease-in-out;
     }
 
-    .navbar .menu-items{
+    .navbars .menu-items{
         padding-top: 100px;
         background: #FF6FA9;
         height: 100vh;
@@ -147,7 +147,7 @@
         overflow: scroll;
     }
 
-    .navbar .menu-items li{
+    .navbars .menu-items li{
         margin-bottom: 1.8rem;
         font-size: 14px;
         font-weight: 500;
@@ -190,7 +190,7 @@
 }
 </style>
 
-<nav class="navbar">
+<nav class="navbars">
     <div class="navbar-container container">
         <input type="checkbox" name="" id="">
         <div class="hamburger-lines">

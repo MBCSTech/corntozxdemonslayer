@@ -9,6 +9,10 @@
             <main class="">
                 {{ $slot }}
             </main>
+
+            @if(!Request::is('game') && !Request::routeIs('game'))
+                @include('layouts.footer')
+            @endif
         </div>
     </body>
 </html>

@@ -2,6 +2,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
     </head>
+    <style>
+        .navbars{
+            position: sticky;
+        }
+    </style>
 
     <body>
         <div id="game-container">

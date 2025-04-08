@@ -74,7 +74,8 @@
         }
     
         .info {
-            color: #000;
+            font-family: "PoppinsExtraBold", sans-serif;
+            color: #231F20;
             font-size: 2.5vw;
             margin-top: 10px;
             max-width: 90%;
@@ -86,7 +87,8 @@
         }
     
         .disclaimer {
-            color: #000;
+            font-family: "PoppinsExtraBold", sans-serif;
+            color: #231F20;
             font-size: 2.5vw;
             margin-top: 10px;
             max-width: 90%;
