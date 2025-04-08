@@ -25,6 +25,10 @@ Route::get('/form-submission', function () {
     return view('form-submission', ['score' => $score]);
 });
 
+Route::get('/confirm', function () {
+    return view('confirmation');
+})->name('game');
+
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [PlayersController::class, 'show'])->name('dashboard');
     Route::get('/dashboard/{id}', [PlayersController::class, 'edit'])->name('player.edit');
