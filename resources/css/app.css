@@ -12,6 +12,11 @@
     src: url(../fonts/Poppins-ExtraBold.ttf);
 }
 
+@font-face {
+    font-family: 'PoppinsBlackItalic';
+    src: url(../fonts/Poppins-BlackItalic.ttf);
+}
+
 * {
     font-family: "Poppins", serif;
 }

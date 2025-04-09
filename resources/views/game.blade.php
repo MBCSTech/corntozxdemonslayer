@@ -48,10 +48,14 @@
             }
 
             create() {
-                this.add
-                    .image(config.width / 2, config.height / 2, "background")
-                    .setDisplaySize(480, 800)
+
+                const canvasWidth = this.sys.game.canvas.width;
+                const canvasHeight = this.sys.game.canvas.height;
+
+                const bg = this.add.image(config.width / 2, config.height / 2, "background")
                     .setDepth(-1);
+
+                bg.setDisplaySize(canvasWidth, canvasHeight);
 
                 const startButton = this.add
                     .image(config.width / 2, 0.75 * config.height, "start-button")
@@ -121,7 +125,7 @@
 
                 this.add
                     .image(config.width / 2, config.height - 5, "instructions")
-                    .setScale(0.17)
+                    .setScale(0.34)
                     .setOrigin(0.5, 1);
             }
 
@@ -712,7 +716,7 @@
             }
 
             create(data) {
-                this.add.image(240, 400, "background").setDisplaySize(480, 800);
+                this.add.image(config.width / 2, config.height / 2, "background").setDisplaySize(config.width, config.height);
 
                 // Add pink overlay with 30% opacity
                 const overlay = this.add.rectangle(240, 400, 480, 800, 0xFF69B4, 0.4);
@@ -721,7 +725,7 @@
                 this.add.image(config.width / 2, 0.35 * config.height, "endscoreboard").setScale(0.25);
 
                 const leaderboard = this.add.image(config.width / 2, 0.58 * config.height, "leaderboard").setScale(
-                    0.25);
+                    0.5);
 
                 this.add
                     .text(0.58 * config.width, 0.36 * config.height, data.score, {
@@ -749,12 +753,12 @@
 
                 const restartButton = this.add
                     .image(config.width / 2, 0.82 * config.height, "restart-button")
-                    .setScale(0.2)
+                    .setScale(0.4)
                     .setInteractive();
 
                 const proceedButton = this.add
                     .image(config.width / 2, 0.9 * config.height, "proceed-button")
-                    .setScale(0.2)
+                    .setScale(0.4)
                     .setInteractive();
 
 
@@ -865,7 +869,7 @@
                 },
             },
             scale: {
-                mode: Phaser.Scale.FIT,
+                mode: Phaser.Scale.EXPAND,
                 autoCenter: Phaser.Scale.CENTER_BOTH, // Center the game within the container
                 min: {
                     width: 320, // Minimum width for mobile

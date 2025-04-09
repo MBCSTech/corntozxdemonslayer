@@ -8,16 +8,41 @@ use Illuminate\Http\Request;
 
 class PlayerFormController extends Controller
 {
+    public function index()
+    {
+        $score = session('last_game_score', 0);
+        return view('form-submission', ['score' => $score]);
+    }
+    
     public function store(Request $request)
     {
         // Validate the incoming request
         $validated = $request->validate([
             'nama' => 'required|string|max:100',
             'no_ic' => 'required|digits:12',
-            'no_fon' => 'required|digits_between:10,12',
-            'resit' => 'required|file|mimes:jpeg,png,jpg,pdf|max:3072',
+            'no_fon' => [
+                'required',
+                'regex:/^[0-9\-]+$/',
+                'min:10',
+                'max:15'
+            ],
+            'receipt' => 'required|file|mimes:jpeg,png,jpg,pdf|max:3072',
+        ], [
+            'nama.required' => 'Sila masukkan nama penuh anda.',
+            'no_ic.required' => 'Sila masukkan nombor kad pengenalan anda.',
+            'no_ic.digits' => 'Nombor kad pengenalan mestilah 12 digit.',
+            'no_fon.required' => 'Sila masukkan nombor telefon anda.',
+            'no_fon.regex' => 'Format nombor telefon tidak sah.',
+            'no_fon.min' => 'Nombor telefon terlalu pendek.',
+            'no_fon.max' => 'Nombor telefon terlalu panjang.',
+            'receipt.required' => 'Sila muat naik resit anda.',
+            'receipt.file' => 'Fail tidak sah.',
+            'receipt.mimes' => 'Format fail tidak disokong. Gunakan jpeg, png, jpg, atau pdf.',
+            'receipt.max' => 'Saiz fail terlalu besar. Had maksimum 3MB.',
         ]);
 
+        // Save the score from session
+        $score = session('last_game_score', 0);
 
         // Determine the puzzle version based on the current date
         $today = Carbon::now();
@@ -85,25 +110,25 @@ class PlayerFormController extends Controller
                 break;
         }
 
-
-        // Create a new PuzzleForm record with the determined puzzle version
-        $puzzleForm = PlayerForm::create([
+        // Create a new PlayerForm record with the determined puzzle version
+        $playerForm = PlayerForm::create([
             'nama' => $request->nama,
             'no_ic' => $request->no_ic,
             'no_fon' => $request->no_fon,
             'week' => $week,
+            'score' => $score, // Store the score
         ]);
 
-        $fileExtension = $request->file('resit')->extension();
-        $filename = "uid" . "{$puzzleForm->id}_{$request->no_ic}.{$fileExtension}";
+        $fileExtension = $request->file('receipt')->extension();
+        $filename = "uid" . "{$playerForm->id}_{$request->no_ic}.{$fileExtension}";
 
         // Store the file
-        $path = $request->file('resit')->storeAs('resit', $filename, 'public');
+        $path = $request->file('receipt')->storeAs('resit', $filename, 'public');
 
         // Update the record with the file path
-        $puzzleForm->update(['resit' => $path]);
+        $playerForm->update(['resit' => $path]);
 
         // Redirect to a confirmation page with a success message
-        return redirect('/confirmation')->with('success', 'Your form has been submitted successfully');
+        return redirect('/confirm')->with('success', 'Your form has been submitted successfully');
     }
 }

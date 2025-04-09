@@ -14,7 +14,7 @@ class PlayerForm extends Model
         'no_ic',
         'no_fon',
         'score',
-        'resit',
+        'receipt',
         'puzzle_version',
     ];
 

@@ -1,9 +1,8 @@
 <?php
 
-use App\Http\Controllers\Players;
+use App\Http\Controllers\PlayerFormController;
 use App\Http\Controllers\PlayersController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\PuzzleFormController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -20,10 +19,8 @@ Route::post('/save-score', function (Request $request) {
     return response()->json(['success' => true]);
 });
 
-Route::get('/form-submission', function () {
-    $score = session('last_game_score', 0);
-    return view('form-submission', ['score' => $score]);
-});
+Route::get('/form-submission', [PlayerFormController::class, 'index'])->name('form-submission');
+Route::post('/form-submission', [PlayerFormController::class, 'store'])->name('player.store');
 
 Route::get('/confirm', function () {
     return view('confirmation');
