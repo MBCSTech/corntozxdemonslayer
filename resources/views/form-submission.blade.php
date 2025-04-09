@@ -1,6 +1,5 @@
 <x-site-layout>
     <style>
-
         .page-container {
             width: 100%;
             margin: 0 auto;
@@ -57,6 +56,8 @@
             margin-top: 30%;
             position: relative;
             z-index: 2;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .winner {
@@ -76,6 +77,7 @@
         }
 
         .daftarsekarang {
+            font-family: 'PoppinsExtraBold', sans-serif;
             font-weight: 800;
             font-size: 13px;
             color: black;
@@ -271,7 +273,7 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             z-index: 10;
             text-align: left;
-            color: black;
+            color: #ff0000;
             font-weight: 400;
             font-size: 12px;
         }
@@ -318,14 +320,38 @@
             font-size: 0.8rem;
         }
 
-        label{
+        label>span,
+        .receipt-title>span {
             font-family: "PoppinsExtraBold", sans-serif;
         }
+
+        .score {
+            position: relative;
+        }
+
+        .score-text {
+            font-family: 'PoppinsBlackItalic', sans-serif;
+            font-size: 1.35rem;
+            position: absolute;
+            top: 74%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            color: #231F20;
+        }
+
+        #icNumberLabel {
+            font-size: 9px
+        }
+
     </style>
 
     <div class="page-container">
         <div class="top-section">
-            <img src="/assets/img/score.png" alt="Score box" class="score-box">
+            <div class="score">
+                <img src="/assets/img/score.png" alt="Score box" class="score-box">
+                <h4 class="score-text">Skor anda: {{ $score }}</h4>
+            </div>
             <img src="/assets/img/winner.png" alt="Winner" class="winner">
         </div>
 
@@ -335,24 +361,27 @@
             <div class="daftarsekarang">Daftar Sekarang dan Mulakan Pengembaraan Anda!</div>
 
             <div class="form-container">
-                <form id="myForm">
+                <form id="myForm" method="POST" action="{{ route('player.store') }}" enctype="multipart/form-data">
+                    @csrf
                     <div class="form-group">
                         <label><span>Nama Penuh</span> (Full Name)</label>
                         <div class="input-container">
-                            <input type="text" class="form-input" id="fullName" placeholder="XXX XXX" required>
-                            <!--<img src="/assets/img/snack1.1.png" class="snack-1" alt="Snack">-->
+                            <input type="text" class="form-input" id="fullName" name="nama" placeholder="XXX XXX" value="{{ old('nama') }}">
+                            <x-validation-error field="nama" />
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label><span>Nombor Telefon</span> (Phone Number)</label>
-                        <input type="tel" class="form-input" id="phoneNumber" placeholder="XXX-XXXXXXX" required>
+                        <input type="tel" class="form-input" id="phoneNumber" name="no_fon" placeholder="XXXXXXXXXX" value="{{ old('no_fon') }}">
+                        <x-validation-error field="no_fon" />
                     </div>
 
                     <div class="form-group">
-                        <label><span>Nombor Kad Pengenalan (IC)</span>
+                        <label id="icNumberLabel"><span>Nombor Kad Pengenalan (IC)</span>
                             (Identification Card Number)</label>
-                        <input type="text" id="icNumber" class="form-input" placeholder="XXXXXXXXXX" required>
+                        <input type="text" id="icNumber" class="form-input" name="no_ic" placeholder="XXXXXXXXXX" value="{{ old('no_ic') }}">
+                        <x-validation-error field="no_ic" />
                     </div>
 
                     <div class="receipt-section">
@@ -361,16 +390,15 @@
                         </div>
                         <div class="receipt-content">
                             <p class="receipt-title"><span>Resit Pembelian</span>
-                                <br>Muat Naik Resit anda</p>
+                                <br>Muat Naik Resit anda
+                            </p>
 
                             <div class="input-container">
-                                <input type="file" id="fileUpload" class="upload-btn"
-                                    accept=".jpg, .jpeg, .png, .pdf" required
+                                <input type="file" id="fileUpload" name="receipt" class="upload-btn"
+                                    accept=".jpg, .jpeg, .png, .pdf"
                                     title="Please attach your receipt. Sila lampirkan resit anda."
                                     style="display: none;">
-                                <!--<img src="/assets/img/snack1.2.png" class="snack-2" alt="Snack">-->
                             </div>
-
 
                             <label for="fileUpload" class="custom-upload-btn">
                                 <img src="/assets/img/uploadicon.png" alt="Upload" class="custom-upload-icon">
@@ -380,8 +408,8 @@
                                 <span class="file-name" id="fileName"></span> <br>
                                 <span class="file-size" id="fileSize"></span>
                             </div>
+                            <x-validation-error field="receipt" />
                         </div>
-                        <div class="error-popup" id="fileErrorPopup">Sila lampirkan resit anda.</div>
                     </div>
 
                     <div class="submit-btn-container">
@@ -393,4 +421,35 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileUpload = document.getElementById('fileUpload');
+            const fileInfo = document.getElementById('fileInfo');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+
+            fileUpload.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    fileName.textContent = file.name;
+                    
+                    // Format file size nicely
+                    let size = file.size;
+                    const units = ['B', 'KB', 'MB', 'GB'];
+                    let unitIndex = 0;
+                    
+                    while (size > 1024 && unitIndex < units.length - 1) {
+                        size /= 1024;
+                        unitIndex++;
+                    }
+                    
+                    fileSize.textContent = Math.round(size * 100) / 100 + ' ' + units[unitIndex];
+                    fileInfo.style.display = 'block';
+                } else {
+                    fileInfo.style.display = 'none';
+                }
+            });
+        });
+    </script>
 </x-site-layout>
