@@ -90,6 +90,25 @@
             padding-bottom: 60px;
         }
 
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            }
+
+        .pulse {
+            animation: pulse 1.5s ease-in-out infinite;
+            }
+
         @media only screen and (max-width: 380px) {
             .instruction-section {
                 height: 64vh;
@@ -136,7 +155,7 @@
                 </div>
                 <img class="chips-group" src="assets/img/chips-group.png" />
             </div>
-            <a href="/game"><img class="main-button" src="assets/img/main-button.png" /></a>
+            <a href="/game"><img class="main-button pulse" src="assets/img/main-button.png" /></a>
         </div>
     </div>
 </x-site-layout>
