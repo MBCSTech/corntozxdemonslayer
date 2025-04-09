@@ -155,7 +155,7 @@
 
     .logo{
         position: absolute;
-        top: 10px;
+        top: 8px;
         right: 15px;
         width: 50%;
     }
