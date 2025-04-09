@@ -126,7 +126,7 @@ class PlayerFormController extends Controller
         $path = $request->file('receipt')->storeAs('resit', $filename, 'public');
 
         // Update the record with the file path
-        $playerForm->update(['resit' => $path]);
+        $playerForm->update(['receipt' => $path]);
 
         // Redirect to a confirmation page with a success message
         return redirect('/confirm')->with('success', 'Your form has been submitted successfully');
