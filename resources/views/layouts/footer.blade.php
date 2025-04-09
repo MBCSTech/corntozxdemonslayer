@@ -19,7 +19,7 @@
 
     .footer-cont img {
         width: 15%;
-        height: fit-content;
+        height: auto;
         margin-right: 16px;
     }
 
