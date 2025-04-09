@@ -1,32 +1,4 @@
-<style>
-    p {
-        margin: 0 !important;
-    }
 
-    .footer-div {
-        background: linear-gradient(0deg, #FAFFB2, #FFCE00, #FFB300);
-        padding: 20px 40px;
-        text-align: center;
-        font-family: 'Poppins', sans-serif;
-        font-size: 9px;
-        color: #231F20;
-    }
-
-    .footer-cont {
-        display: flex;
-        justify-content: center;
-    }
-
-    .footer-cont img {
-        width: 15%;
-        height: fit-content;
-        margin-right: 16px;
-    }
-
-    .footer-copy {
-        align-self: center;
-    }
-</style>
 
 <div class="footer-div">
     <div class="footer-cont">
