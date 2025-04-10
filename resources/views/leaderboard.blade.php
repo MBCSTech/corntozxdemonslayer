@@ -84,6 +84,7 @@
         .leaderboard-container {
             position: relative;
             width: 100%;
+            transform: translate(-1%, 0);
             max-width: 500px;
             margin: -40px auto 0;
         }

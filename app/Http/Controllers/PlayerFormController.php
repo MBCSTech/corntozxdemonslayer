@@ -13,18 +13,36 @@ class PlayerFormController extends Controller
         $score = session('last_game_score', 0);
         return view('form-submission', ['score' => $score]);
     }
-    
+
     public function store(Request $request)
     {
         // Validate the incoming request
         $validated = $request->validate([
             'nama' => 'required|string|max:100',
-            'no_ic' => 'required|digits:12',
+            'no_ic' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    if (preg_match('/[a-zA-Z]/', $value)) {
+                        $fail('Sila gunakan nombor sahaja.');
+                    }
+                },
+                function ($attribute, $value, $fail) {
+                    if (strpos($value, '-') !== false) {
+                        $fail('Sila gunakan format nombor IC yang sah tanpa tanda (-).');
+                    }
+                },
+                'digits:12',
+            ],
             'no_fon' => [
                 'required',
+                function ($attribute, $value, $fail) {
+                    if (preg_match('/[a-zA-Z]/', $value)) {
+                        $fail('Sila gunakan nombor sahaja.');
+                    }
+                },
                 'regex:/^[0-9\-]+$/',
                 'min:10',
-                'max:15'
+                'max:15',
             ],
             'receipt' => 'required|file|mimes:jpeg,png,jpg,pdf|max:3072',
         ], [
@@ -40,6 +58,7 @@ class PlayerFormController extends Controller
             'receipt.mimes' => 'Format fail tidak disokong. Gunakan jpeg, png, jpg, atau pdf.',
             'receipt.max' => 'Saiz fail terlalu besar. Had maksimum 3MB.',
         ]);
+
 
         // Save the score from session
         $score = session('last_game_score', 0);
