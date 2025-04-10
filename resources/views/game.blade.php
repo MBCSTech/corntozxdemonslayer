@@ -8,18 +8,35 @@
         }
 
         #game-container {
-            overflow-y: auto;
-            max-height: 100vh;
+            position: relative;
             width: 100%;
+            max-width: 480px;
+            overflow: hidden;
+        }
+
+        #game-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('assets/bg.png');
+            background-size: cover;
+            background-position: center;
+            z-index: 0;
         }
 
         #phaser-game {
-            max-height: 100vh
+            position: relative;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
         }
     </style>
 
     <body>
         <div id="game-container">
+            <div id="game-background"></div>
             <div id="phaser-game"></div>
         </div>
     </body>
@@ -61,7 +78,7 @@
                     "assets/fonts/Poppins-ExtraBold.ttf",
                     "truetype"
                 );
-                this.load.image("background", "assets/bg.png");
+                // this.load.image("background", "assets/bg.png");
                 this.load.image("snack", "assets/snack.png");
                 this.load.image("snack2", "assets/snack2.png");
                 this.load.image("snack3", "assets/snack3.png");
@@ -83,7 +100,7 @@
                 this.gameStartTime = this.time.now; // Record when the game started
                 this.lastSpawnTime = this.time.now; // Track last spawn time
 
-                this.add.image(240, 400, "background").setDisplaySize(480, 800);
+                // this.add.image(240, 400, "background").setDisplaySize(480, 800);
 
                 this.add.image(0.17 * config.width, 0.075 * config.height, "scoreboard").setScale(0.55);
                 this.add.image(0.9 * config.width, 0.08 * config.height, "timerc").setScale(0.25);
@@ -491,7 +508,7 @@
                             ease: 'Power2',
                             onComplete: () => {
                                 this.levelText.y -=
-                                20; // Reset position for next notification
+                                    20; // Reset position for next notification
                             }
                         });
                     }
@@ -576,7 +593,7 @@
                 this.physics.pause();
 
                 // Create a semi-transparent black overlay
-                const overlay = this.add.rectangle(240, 400, 480, 800, 0x000000, 0.7)
+                const overlay = this.add.rectangle(240, 400, 480, 800, 0x000000, 0)
                     .setDepth(2000)
                     .setAlpha(0);
 
@@ -642,7 +659,7 @@
                                                 this.time
                                                     .delayedCall(
                                                         1500,
-                                                    () => {
+                                                        () => {
                                                             // Fade out
                                                             this.cameras
                                                                 .main
@@ -651,7 +668,7 @@
                                                                     0,
                                                                     0,
                                                                     0
-                                                                    );
+                                                                );
                                                             this.cameras
                                                                 .main
                                                                 .once(
@@ -690,21 +707,21 @@
                                                                                         .href =
                                                                                         "/leaderboard";
                                                                                 }
-                                                                                )
+                                                                            )
                                                                             .catch(
                                                                                 error => {
                                                                                     console
                                                                                         .error(
                                                                                             'Error saving score:',
                                                                                             error
-                                                                                            );
+                                                                                        );
                                                                                     // Still redirect even if there was an error
                                                                                     window
                                                                                         .location
                                                                                         .href =
                                                                                         "/leaderboard";
                                                                                 }
-                                                                                );
+                                                                            );
                                                                     }
                                                                 );
                                                         });
@@ -723,7 +740,8 @@
             type: Phaser.AUTO,
             width: 480, // Portrait width (mobile size)
             height: 750, // Portrait height (tablet size)
-            backgroundColor: "#ffffff",
+            backgroundColor: "transparent",
+            transparent: true,
             parent: "phaser-game", // Bind the game to the container
             scene: [GamePlayScene],
             physics: {
