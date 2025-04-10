@@ -42,6 +42,17 @@
                 this.trailPoints = []; // Store points for the trailing effect
                 this.sliceGraphics = null; // Graphics object for the trailing effect
                 this.slashActive = false; // Flag to control active slashing
+
+                // Difficulty properties
+                this.difficultyLevel = 1; // Starting difficulty level
+                this.lastDifficultyIncrease = 0; // Track when difficulty was last increased
+                this.difficultyIncreaseInterval = 10; // Seconds between difficulty increases
+                this.spawnDelay = 1000; // Initial spawn delay in milliseconds
+                this.minSpawnDelay = 300; // Minimum spawn delay (for highest difficulty)
+                this.baseObjectSpeed = 500; // Base vertical speed for objects
+                this.speedIncreasePerLevel = 50; // How much to increase speed per level
+                this.bombProbability = 0.2; // Starting probability of spawning a bomb
+                this.maxBombProbability = 0.35; // Maximum bomb probability at highest difficulty
             }
 
             preload() {
@@ -57,6 +68,7 @@
                 this.load.image("bomb", "assets/bomb2.png");
                 this.load.audio("slice", "assets/slice.mp3");
                 this.load.audio("explosion", "assets/explosion.mp3");
+                this.load.audio("levelup", "assets/levelup.mp3"); // Add a level up sound
                 this.load.image("scoreboard", "assets/scoreboard.png");
                 this.load.image("timerc", "assets/timerc.png");
             }
@@ -68,6 +80,9 @@
                 this.isGameEnding = false;
                 score = 0;
                 countdown = 60;
+                this.gameStartTime = this.time.now; // Record when the game started
+                this.lastSpawnTime = this.time.now; // Track last spawn time
+
                 this.add.image(240, 400, "background").setDisplaySize(480, 800);
 
                 this.add.image(0.17 * config.width, 0.075 * config.height, "scoreboard").setScale(0.55);
@@ -92,7 +107,17 @@
                     .setOrigin(0.5)
                     .setAngle(-14);
 
-
+                // Level indicator
+                this.levelText = this.add
+                    .text(240, 50, "LEVEL 1", {
+                        fontFamily: "PoppinsExtraBold",
+                        fontSize: "24px",
+                        fill: "#FF6FAC",
+                        stroke: "#000",
+                        strokeThickness: 3
+                    })
+                    .setOrigin(0.5)
+                    .setAlpha(0);
 
                 // Timer for countdown
                 this.countdownTimer = this.time.addEvent({
@@ -162,7 +187,15 @@
                     this.swipeStart = null; // Reset swipe start
                 });
 
+                // Start spawning objects
+                this.startSpawning();
+            }
+
+            startSpawning() {
+                // Initial object spawn
                 this.spawnObjects();
+
+                // Instead of a fixed timer, we'll handle spawning dynamically in the update method
             }
 
             updateTrail(pointer) {
@@ -397,9 +430,72 @@
                 countdown--; // Decrement the countdown
                 this.countdownText.setText(countdown); // Update the countdown text
 
+                // Check for difficulty increase every difficultyIncreaseInterval seconds
+                const elapsedGameTime = Math.floor((this.time.now - this.gameStartTime) / 1000);
+                if (elapsedGameTime >= this.lastDifficultyIncrease + this.difficultyIncreaseInterval) {
+                    this.increaseDifficulty();
+                }
+
                 if (countdown <= 0) {
                     this.endGame('timeout'); // Specify 'timeout' as reason (or use default)
                 }
+            }
+
+            increaseDifficulty() {
+                this.difficultyLevel++;
+                this.lastDifficultyIncrease = Math.floor((this.time.now - this.gameStartTime) / 1000);
+
+                // Calculate new spawn delay (gets shorter as difficulty increases)
+                this.spawnDelay = Math.max(
+                    this.minSpawnDelay,
+                    1000 - (this.difficultyLevel - 1) * 100
+                );
+
+                // Increase bomb probability (capped at maximum)
+                this.bombProbability = Math.min(
+                    this.maxBombProbability,
+                    0.2 + (this.difficultyLevel - 1) * 0.03
+                );
+
+                // Show level up notification
+                this.showLevelUpNotification();
+
+                // Play level up sound
+                if (this.sound.get('levelup')) {
+                    this.sound.play("levelup", {
+                        volume: 0.5
+                    });
+                }
+            }
+
+            showLevelUpNotification() {
+                // Update level text
+                this.levelText.setText("LEVEL " + this.difficultyLevel)
+                    .setAlpha(0)
+                    .setScale(0.5);
+
+                // Animate level up notification
+                this.tweens.add({
+                    targets: this.levelText,
+                    alpha: 1,
+                    scale: 1.2,
+                    duration: 500,
+                    ease: 'Back.easeOut',
+                    onComplete: () => {
+                        this.tweens.add({
+                            targets: this.levelText,
+                            alpha: 0,
+                            y: '+=20',
+                            duration: 800,
+                            delay: 800,
+                            ease: 'Power2',
+                            onComplete: () => {
+                                this.levelText.y -=
+                                20; // Reset position for next notification
+                            }
+                        });
+                    }
+                });
             }
 
             spawnObjects() {
@@ -407,19 +503,64 @@
                 const randomFruit = Phaser.Utils.Array.GetRandom(fruits);
 
                 const x = Phaser.Math.Between(50, 430); // Random horizontal position
-                const y = 900; // Spawn off-screen at the bottom (thrown higher)
+                const y = 900; // Spawn off-screen at the bottom
 
-                if (Math.random() > 0.2) {
+                // Calculate current object speed based on difficulty
+                const currentSpeed = this.baseObjectSpeed + (this.difficultyLevel - 1) * this.speedIncreasePerLevel;
+
+                // Random horizontal velocity, getting more extreme at higher levels
+                const horizontalSpeedRange = 50 + (this.difficultyLevel * 10);
+                const horizontalSpeed = Phaser.Math.Between(-horizontalSpeedRange, horizontalSpeedRange);
+
+                // Random bomb or fruit based on current probability
+                if (Math.random() > this.bombProbability) {
                     const fruit = this.fruits.create(x, y, randomFruit);
-                    fruit.setVelocity(Phaser.Math.Between(-100, 100), -
-                        500); // Throw higher with more vertical velocity
+                    fruit.setVelocity(horizontalSpeed, -currentSpeed);
+
+                    // Add spin to fruits at higher difficulty
+                    if (this.difficultyLevel > 2) {
+                        fruit.setAngularVelocity(Phaser.Math.Between(-100, 100));
+                    }
                 } else {
                     const bomb = this.bombs.create(x, y, "bomb").setScale(0.7);
-                    bomb.setVelocity(Phaser.Math.Between(-100, 100), -
-                        500); // Throw higher with more vertical velocity
+                    bomb.setVelocity(horizontalSpeed, -currentSpeed);
+
+                    // Add spin to bombs at higher levels
+                    if (this.difficultyLevel > 3) {
+                        bomb.setAngularVelocity(Phaser.Math.Between(-150, 150));
+                    }
                 }
 
-                this.time.delayedCall(1000, this.spawnObjects, [], this);
+                // At higher levels, spawn additional objects occasionally
+                if (this.difficultyLevel >= 3 && Math.random() > 0.7) {
+                    this.time.delayedCall(200, () => {
+                        if (!this.isGameEnding) {
+                            this.spawnObjects();
+                        }
+                    });
+                }
+
+                // Schedule next spawn based on current spawn delay
+                this.time.delayedCall(this.spawnDelay, () => {
+                    if (!this.isGameEnding) {
+                        this.spawnObjects();
+                    }
+                });
+            }
+
+            update() {
+                // Clean up objects that have moved off screen to improve performance
+                this.fruits.getChildren().forEach(fruit => {
+                    if (fruit.y > 900 || fruit.y < -100 || fruit.x < -50 || fruit.x > 530) {
+                        fruit.destroy();
+                    }
+                });
+
+                this.bombs.getChildren().forEach(bomb => {
+                    if (bomb.y > 900 || bomb.y < -100 || bomb.x < -50 || bomb.x > 530) {
+                        bomb.destroy();
+                    }
+                });
             }
 
             endGame(reason = 'timeout') {
@@ -456,6 +597,17 @@
                     .setAlpha(0)
                     .setScale(0.5);
 
+                // Add final score and level reached
+                const statsText = this.add.text(240, 470, `Score: ${score}\nLevel: ${this.difficultyLevel}`, {
+                        fontFamily: "PoppinsExtraBold",
+                        fontSize: "30px",
+                        fill: "#FFFFFF",
+                        align: "center"
+                    })
+                    .setOrigin(0.5)
+                    .setDepth(2001)
+                    .setAlpha(0);
+
                 // Create animation sequence
                 this.tweens.add({
                     targets: overlay,
@@ -478,57 +630,85 @@
                                     duration: 200,
                                     ease: 'Bounce.easeOut',
                                     onComplete: () => {
-                                        // Hold for a moment before transitioning
-                                        this.time.delayedCall(1000, () => {
-                                            // Fade out
-                                            this.cameras.main.fadeOut(
-                                                250, 0, 0, 0);
-                                            this.cameras.main.once(
-                                                Phaser.Cameras
-                                                .Scene2D.Events
-                                                .FADE_OUT_COMPLETE,
-                                                () => {
-                                                    // Send the score to Laravel backend using fetch
-                                                    fetch('/save-score', {
-                                                            method: 'POST',
-                                                            headers: {
-                                                                'Content-Type': 'application/json',
-                                                                'X-CSRF-TOKEN': document
-                                                                    .querySelector(
-                                                                        'meta[name="csrf-token"]'
-                                                                        )
-                                                                    .getAttribute(
-                                                                        'content'
-                                                                        )
-                                                            },
-                                                            body: JSON
-                                                                .stringify({
-                                                                    score: score
-                                                                })
-                                                        })
-                                                        .then(
-                                                            response => {
-                                                                // Redirect to leaderboard page after storing in session
-                                                                window
-                                                                    .location
-                                                                    .href =
-                                                                    "/leaderboard";
-                                                            })
-                                                        .catch(
-                                                            error => {
-                                                                console
-                                                                    .error(
-                                                                        'Error saving score:',
-                                                                        error
-                                                                        );
-                                                                // Still redirect even if there was an error
-                                                                window
-                                                                    .location
-                                                                    .href =
-                                                                    "/leaderboard";
-                                                            });
-                                                }
-                                            );
+                                        // Show stats
+                                        this.tweens.add({
+                                            targets: statsText,
+                                            alpha: 1,
+                                            y: 480,
+                                            duration: 300,
+                                            ease: 'Power2',
+                                            onComplete: () => {
+                                                // Hold for a moment before transitioning
+                                                this.time
+                                                    .delayedCall(
+                                                        1500,
+                                                    () => {
+                                                            // Fade out
+                                                            this.cameras
+                                                                .main
+                                                                .fadeOut(
+                                                                    250,
+                                                                    0,
+                                                                    0,
+                                                                    0
+                                                                    );
+                                                            this.cameras
+                                                                .main
+                                                                .once(
+                                                                    Phaser
+                                                                    .Cameras
+                                                                    .Scene2D
+                                                                    .Events
+                                                                    .FADE_OUT_COMPLETE,
+                                                                    () => {
+                                                                        // Send the score to Laravel backend using fetch
+                                                                        fetch
+                                                                            ('/save-score', {
+                                                                                method: 'POST',
+                                                                                headers: {
+                                                                                    'Content-Type': 'application/json',
+                                                                                    'X-CSRF-TOKEN': document
+                                                                                        .querySelector(
+                                                                                            'meta[name="csrf-token"]'
+                                                                                        )
+                                                                                        .getAttribute(
+                                                                                            'content'
+                                                                                        )
+                                                                                },
+                                                                                body: JSON
+                                                                                    .stringify({
+                                                                                        score: score,
+                                                                                        level: this
+                                                                                            .difficultyLevel
+                                                                                    })
+                                                                            })
+                                                                            .then(
+                                                                                response => {
+                                                                                    // Redirect to leaderboard page after storing in session
+                                                                                    window
+                                                                                        .location
+                                                                                        .href =
+                                                                                        "/leaderboard";
+                                                                                }
+                                                                                )
+                                                                            .catch(
+                                                                                error => {
+                                                                                    console
+                                                                                        .error(
+                                                                                            'Error saving score:',
+                                                                                            error
+                                                                                            );
+                                                                                    // Still redirect even if there was an error
+                                                                                    window
+                                                                                        .location
+                                                                                        .href =
+                                                                                        "/leaderboard";
+                                                                                }
+                                                                                );
+                                                                    }
+                                                                );
+                                                        });
+                                            }
                                         });
                                     }
                                 });
