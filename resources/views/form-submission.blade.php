@@ -140,23 +140,29 @@
             color: #000000;
         }
 
-        .snack-1 {
-            position: absolute;
-            right: -12%;
-            top: -15px;
-            transform: translateY(-50%);
-            width: 27%;
-            z-index: 2;
+        /*Corn Snack Part*/
+        .receipt-section .input-container {
+            position: relative;
         }
 
-        .snack-2 {
+        .input-container .snack-1 {
             position: absolute;
-            left: -110%;
-            top: 20px;
-            transform: translateX(-50%);
-            width: 80%;
-            z-index: 2;
+            right: -45px;
+            bottom: 10px;
+            width: 90px;
+            height: auto;
+            z-index: 10;
         }
+
+        .receipt-section .snack-2 {
+            position: absolute;
+            left: -45px;
+            top: 60px;
+            width: 100px;
+            height: auto;
+            z-index: 10;
+        }
+
 
         ::placeholder {
             color: black !important;
@@ -331,10 +337,11 @@
 
         .score-text {
             font-family: 'PoppinsBlackItalic', sans-serif;
-            font-size: 1.75rem;
+            font-size: 1.35rem;
             position: absolute;
-            top: 73%;
-            left: 56%;
+            top: 74%;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 3;
             color: #231F20;
         }
@@ -343,13 +350,26 @@
             font-size: 9px
         }
 
+
+        @media screen and (max-width: 320px) {
+            .input-container .snack-1 {
+                width: 70px;
+                right: -36px;
+                bottom: 30%;
+            }
+
+            .receipt-section .snack-2 {
+                width: 80px;
+
+            }
+        }
     </style>
 
     <div class="page-container">
         <div class="top-section">
             <div class="score">
                 <img src="/assets/img/score.png" alt="Score box" class="score-box">
-                <h4 class="score-text">{{ $score }}</h4>
+                <h4 class="score-text">Skor anda: {{ $score }}</h4>
             </div>
             <img src="/assets/img/winner.png" alt="Winner" class="winner">
         </div>
@@ -365,25 +385,30 @@
                     <div class="form-group">
                         <label><span>Nama Penuh</span> (Full Name)</label>
                         <div class="input-container">
-                            <input type="text" class="form-input" id="fullName" name="nama" placeholder="XXX XXX" value="{{ old('nama') }}">
+                            <input type="text" class="form-input" id="fullName" name="nama" placeholder="XXX XXX"
+                                value="{{ old('nama') }}">
                             <x-validation-error field="nama" />
+                            <img src="/assets/img/snack1.png" class="snack-1">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label><span>Nombor Telefon</span> (Phone Number)</label>
-                        <input type="tel" class="form-input" id="phoneNumber" name="no_fon" placeholder="XXXXXXXXXX" value="{{ old('no_fon') }}">
+                        <input type="tel" class="form-input" id="phoneNumber" name="no_fon"
+                            placeholder="XXXXXXXXXX" value="{{ old('no_fon') }}">
                         <x-validation-error field="no_fon" />
                     </div>
 
                     <div class="form-group">
                         <label id="icNumberLabel"><span>Nombor Kad Pengenalan (IC)</span>
                             (Identification Card Number)</label>
-                        <input type="text" id="icNumber" class="form-input" name="no_ic" placeholder="XXXXXXXXXX" value="{{ old('no_ic') }}">
+                        <input type="text" id="icNumber" class="form-input" name="no_ic" placeholder="XXXXXXXXXX"
+                            value="{{ old('no_ic') }}">
                         <x-validation-error field="no_ic" />
                     </div>
 
                     <div class="receipt-section">
+                        <img src="/assets/img/snack2.png" class="snack-2">
                         <div class="receipt-icon">
                             <img src="/assets/img/receipticon.png" alt="Receipt Icon">
                         </div>
@@ -432,17 +457,17 @@
                 if (this.files && this.files[0]) {
                     const file = this.files[0];
                     fileName.textContent = file.name;
-                    
+
                     // Format file size nicely
                     let size = file.size;
                     const units = ['B', 'KB', 'MB', 'GB'];
                     let unitIndex = 0;
-                    
+
                     while (size > 1024 && unitIndex < units.length - 1) {
                         size /= 1024;
                         unitIndex++;
                     }
-                    
+
                     fileSize.textContent = Math.round(size * 100) / 100 + ' ' + units[unitIndex];
                     fileInfo.style.display = 'block';
                 } else {

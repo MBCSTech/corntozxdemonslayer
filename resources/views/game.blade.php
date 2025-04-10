@@ -3,13 +3,24 @@
     <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.min.js"></script>
     </head>
     <style>
-        .navbars{
+        .navbars {
             position: sticky;
+        }
+
+        #game-container {
+            overflow-y: auto;
+            max-height: 100vh;
+            width: 100%;
+        }
+
+        #phaser-game {
+            max-height: 100vh
         }
     </style>
 
     <body>
         <div id="game-container">
+            <div id="phaser-game"></div>
         </div>
     </body>
 
@@ -19,226 +30,6 @@
         let timer;
         let countdown; // Variable to store the countdown time
         let countdownText; // Variable to store the countdown text object
-
-        // Main Menu Scene
-        // Main Menu Scene with double slashing effect
-        class MainMenuScene extends Phaser.Scene {
-            constructor() {
-                super({
-                    key: "MainMenuScene",
-                });
-            }
-
-            preload() {
-                this.load.font(
-                    "PoppinsExtraBold",
-                    "assets/fonts/Poppins-ExtraBold.ttf",
-                    "truetype"
-                );
-                this.load.image("background", "assets/bg.png");
-                this.load.image("start-button", "assets/start-button.png");
-                this.load.image("masthead", "assets/masthead.png");
-                this.load.image("samurai-pinko", "assets/samurai-pinko.png");
-                this.load.image("instructions", "assets/instructions.png");
-                this.load.image("mute", "assets/mute.png");
-                this.load.image("unmute", "assets/unmute.png");
-
-                // Add audio for slash effect
-                this.load.audio("slash", "assets/slice.mp3");
-            }
-
-            create() {
-
-                const canvasWidth = this.sys.game.canvas.width;
-                const canvasHeight = this.sys.game.canvas.height;
-
-                const bg = this.add.image(config.width / 2, config.height / 2, "background")
-                    .setDepth(-1);
-
-                bg.setDisplaySize(canvasWidth, canvasHeight);
-
-                const startButton = this.add
-                    .image(config.width / 2, 0.75 * config.height, "start-button")
-                    .setScale(0.4)
-                    .setInteractive();
-
-                this.tweens.add({
-                    targets: startButton,
-                    scale: 0.45,
-                    duration: 800,
-                    yoyo: true,
-                    ease: "Sine.easeInOut",
-                    repeat: -1,
-                });
-
-                // Initialize slash graphics with high depth to appear on top of everything
-                this.slashGraphics = this.add.graphics().setDepth(1000);
-
-                this.add
-                    .image(config.width / 2, 0.4 * config.height, "samurai-pinko")
-                    .setScale(0.4);
-                this.add
-                    .image(config.width / 2, 0.2 * config.height, "masthead")
-                    .setScale(0.4);
-
-                startButton
-                    .on("pointerover", () => {
-                        // Change cursor to pointer when hovering
-                        this.input.setDefaultCursor("pointer");
-                    })
-                    .on("pointerout", () => {
-                        // Revert cursor to default when not hovering
-                        this.input.setDefaultCursor("default");
-                    })
-                    .on("pointerdown", () => {
-                        // Disable button and reset cursor
-                        startButton.disableInteractive();
-                        this.input.setDefaultCursor("default");
-
-                        // Create the first slashing effect (left to right)
-                        this.createSlashEffect(1, () => {
-                            // After first slash completes, create second slash (right to left)
-                            this.createSlashEffect(-1, () => {
-                                // After both slashes, shake camera and proceed
-                                this.cameras.main.shake(200, 0.015);
-
-                                // Add fade out effect after shake
-                                this.cameras.main.once(
-                                    Phaser.Cameras.Scene2D.Events.SHAKE_COMPLETE,
-                                    (cam, effect) => {
-                                        this.cameras.main.fadeOut(250, 0, 0, 0);
-
-                                        // Start next scene after fade out completes
-                                        this.cameras.main.once(
-                                            Phaser.Cameras.Scene2D.Events
-                                            .FADE_OUT_COMPLETE,
-                                            (cam, effect) => {
-                                                this.scene.start("GamePlayScene");
-                                            }
-                                        );
-                                    }
-                                );
-                            });
-                        });
-                    });
-
-
-                this.add
-                    .image(config.width / 2, config.height - 5, "instructions")
-                    .setScale(0.34)
-                    .setOrigin(0.5, 1);
-            }
-
-            createSlashEffect(direction, onComplete) {
-                // Play slash sound
-                // this.sound.play("slash");
-
-                // Clear any existing graphics
-                this.slashGraphics.clear();
-
-                // Define slash path coordinates
-                const slashPoints = [];
-                const startX = direction > 0 ? 0 : config.width;
-                const endX = direction > 0 ? config.width : 0;
-
-                // Create different Y positions for the two slashes
-                const midY = direction > 0 ?
-                    config.height * 0.4 : // First slash (left to right) higher
-                    config.height * 0.6; // Second slash (right to left) lower
-
-                const amplitude = 120; // Height of slash curve
-
-                // Create curve for slash path
-                for (let i = 0; i <= 20; i++) {
-                    const t = i / 20;
-                    const x = startX + (endX - startX) * t;
-                    const y = midY + Math.sin(t * Math.PI) * amplitude;
-                    slashPoints.push({
-                        x,
-                        y
-                    });
-                }
-
-                // Animate the slash drawing
-                let step = 0;
-                const slashTimer = this.time.addEvent({
-                    delay: 8, // Fast animation
-                    callback: () => {
-                        if (step < slashPoints.length - 1) {
-                            // Draw each segment of the slash with varying thickness
-                            const thickness = 15 * Math.sin((step / slashPoints.length) * Math.PI);
-
-                            // Vibrant pink color
-                            const pinkColor = 0xFF6FAC;
-
-                            this.slashGraphics.lineStyle(thickness, pinkColor, 0.8);
-                            this.slashGraphics.beginPath();
-                            this.slashGraphics.moveTo(slashPoints[step].x, slashPoints[step].y);
-                            this.slashGraphics.lineTo(slashPoints[step + 1].x, slashPoints[step + 1].y);
-                            this.slashGraphics.strokePath();
-
-                            // Add particles along the slash
-                            if (step % 1 === 0) {
-                                this.createSlashParticles(slashPoints[step].x, slashPoints[step].y,
-                                    pinkColor);
-                            }
-
-                            step++;
-                        } else {
-                            slashTimer.destroy();
-
-                            // Fade out the slash
-                            this.tweens.add({
-                                targets: this.slashGraphics,
-                                alpha: 0,
-                                duration: 150,
-                                onComplete: () => {
-                                    this.slashGraphics.clear();
-                                    this.slashGraphics.alpha = 1;
-
-                                    // Call the onComplete callback when the slash is done
-                                    if (onComplete) {
-                                        onComplete();
-                                    }
-                                }
-                            });
-                        }
-                    },
-                    callbackScope: this,
-                    repeat: slashPoints.length
-                });
-            }
-
-            createSlashParticles(x, y, color) {
-                // Create spark-like particles at slash points
-                const particles = this.add.particles(x, y, 'start-button', {
-                    speed: {
-                        min: 120,
-                        max: 250
-                    },
-                    scale: {
-                        start: 0.1,
-                        end: 0
-                    },
-                    alpha: {
-                        start: 0.7,
-                        end: 0
-                    },
-                    lifespan: 250,
-                    blendMode: 'ADD',
-                    tint: color,
-                    quantity: 3,
-                    emitting: false
-                }).setDepth(1001);
-
-                particles.explode();
-
-                // Clean up particles
-                this.time.delayedCall(250, () => {
-                    particles.destroy();
-                });
-            }
-        }
 
         // Game Play Scene
         // Game Play Scene with enhanced slashing effect
@@ -254,6 +45,12 @@
             }
 
             preload() {
+                this.load.font(
+                    "PoppinsExtraBold",
+                    "assets/fonts/Poppins-ExtraBold.ttf",
+                    "truetype"
+                );
+                this.load.image("background", "assets/bg.png");
                 this.load.image("snack", "assets/snack.png");
                 this.load.image("snack2", "assets/snack2.png");
                 this.load.image("snack3", "assets/snack3.png");
@@ -295,8 +92,10 @@
                     .setOrigin(0.5)
                     .setAngle(-14);
 
+
+
                 // Timer for countdown
-                this.time.addEvent({
+                this.countdownTimer = this.time.addEvent({
                     delay: 1000, // Update every second
                     callback: this.updateCountdown,
                     callbackScope: this,
@@ -594,6 +393,7 @@
             }
 
             updateCountdown() {
+                if (this.isGameEnding) return;
                 countdown--; // Decrement the countdown
                 this.countdownText.setText(countdown); // Update the countdown text
 
@@ -626,6 +426,10 @@
                 // Only proceed if we haven't already triggered the end sequence
                 if (this.isGameEnding) return;
                 this.isGameEnding = true;
+
+                if (this.countdownTimer) {
+                    this.countdownTimer.remove(false);
+                }
 
                 // Pause physics to freeze objects in place
                 this.physics.pause();
@@ -684,10 +488,44 @@
                                                 .Scene2D.Events
                                                 .FADE_OUT_COMPLETE,
                                                 () => {
-                                                    this.scene
-                                                        .start(
-                                                            "GameOverScene", {
-                                                                score
+                                                    // Send the score to Laravel backend using fetch
+                                                    fetch('/save-score', {
+                                                            method: 'POST',
+                                                            headers: {
+                                                                'Content-Type': 'application/json',
+                                                                'X-CSRF-TOKEN': document
+                                                                    .querySelector(
+                                                                        'meta[name="csrf-token"]'
+                                                                        )
+                                                                    .getAttribute(
+                                                                        'content'
+                                                                        )
+                                                            },
+                                                            body: JSON
+                                                                .stringify({
+                                                                    score: score
+                                                                })
+                                                        })
+                                                        .then(
+                                                            response => {
+                                                                // Redirect to leaderboard page after storing in session
+                                                                window
+                                                                    .location
+                                                                    .href =
+                                                                    "/leaderboard";
+                                                            })
+                                                        .catch(
+                                                            error => {
+                                                                console
+                                                                    .error(
+                                                                        'Error saving score:',
+                                                                        error
+                                                                        );
+                                                                // Still redirect even if there was an error
+                                                                window
+                                                                    .location
+                                                                    .href =
+                                                                    "/leaderboard";
                                                             });
                                                 }
                                             );
@@ -701,164 +539,13 @@
             }
         }
 
-        // Game Over Scene
-        class GameOverScene extends Phaser.Scene {
-            constructor() {
-                super({
-                    key: "GameOverScene"
-                });
-            }
-            preload() {
-                this.load.image("endscoreboard", "assets/endscoreboard.png");
-                this.load.image("leaderboard", "assets/leaderboard.png");
-                this.load.image("restart-button", "assets/restart-button.png");
-                this.load.image("proceed-button", "assets/proceed-button.png");
-            }
-
-            create(data) {
-                this.add.image(config.width / 2, config.height / 2, "background").setDisplaySize(config.width, config.height);
-
-                // Add pink overlay with 30% opacity
-                const overlay = this.add.rectangle(240, 400, 480, 800, 0xFF69B4, 0.4);
-
-                this.add.image(config.width / 2, 0.12 * config.height, "masthead").setScale(0.45);
-                this.add.image(config.width / 2, 0.35 * config.height, "endscoreboard").setScale(0.25);
-
-                const leaderboard = this.add.image(config.width / 2, 0.58 * config.height, "leaderboard").setScale(
-                    0.5);
-
-                this.add
-                    .text(0.58 * config.width, 0.36 * config.height, data.score, {
-                        fontFamily: "PoppinsExtraBold",
-                        fontSize: "32px",
-                        fill: "#fff",
-                    })
-                    .setOrigin(0.5);
-
-                const leaderboardData = [{
-                        name: 'Alex',
-                        score: 1000
-                    },
-                    {
-                        name: 'Brian',
-                        score: 850
-                    },
-                    {
-                        name: 'Taylor',
-                        score: 290
-                    },
-                ]
-
-                this.displayLeaderboard(leaderboard, leaderboardData);
-
-                const restartButton = this.add
-                    .image(config.width / 2, 0.82 * config.height, "restart-button")
-                    .setScale(0.4)
-                    .setInteractive();
-
-                const proceedButton = this.add
-                    .image(config.width / 2, 0.9 * config.height, "proceed-button")
-                    .setScale(0.4)
-                    .setInteractive();
-
-
-                restartButton.on("pointerdown", () => {
-                        this.scene.start("GamePlayScene");
-                    }).on("pointerover", () => {
-                        // Change cursor to pointer when hovering
-                        this.input.setDefaultCursor("pointer");
-                    })
-                    .on("pointerout", () => {
-                        // Revert cursor to default when not hovering
-                        this.input.setDefaultCursor("default");
-                    })
-                    .on("pointerdown", () => {
-                        // Disable button and reset cursor
-                        restartButton.disableInteractive();
-                        this.input.setDefaultCursor("default");
-                    });
-
-                proceedButton.on("pointerdown", () => {
-                        fetch('/save-score', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
-                                    .getAttribute('content')
-                            },
-                            body: JSON.stringify({
-                                score: data.score
-                            })
-                        }).then(() => {
-                            window.location.href = '/form-submission';
-                        }).catch(error => {
-                            console.error(error);
-                        });
-                    }).on("pointerover", () => {
-                        // Change cursor to pointer when hovering
-                        this.input.setDefaultCursor("pointer");
-                    })
-                    .on("pointerout", () => {
-                        // Revert cursor to default when not hovering
-                        this.input.setDefaultCursor("default");
-                    })
-                    .on("pointerdown", () => {
-                        // Disable button and reset cursor
-                        restartButton.disableInteractive();
-                        this.input.setDefaultCursor("default");
-                    });
-            }
-
-            displayLeaderboard(leaderboard, data) {
-                const leaderboardX = leaderboard.x + 80;
-                const leaderboardY = leaderboard.y;
-                const leaderboardWidth = leaderboard.width * leaderboard.scale;
-                const leaderboardHeight = leaderboard.height * leaderboard.scale;
-
-                // Calculate positions relative to the leaderboard
-                const startY = leaderboardY + leaderboardHeight * 0.08; // Start position for first entry
-                const entryHeight = leaderboardHeight * 0.16; // Height of each entry
-
-                // Sort data by score (highest first)
-                const sortedData = [...data].sort((a, b) => b.score - a.score);
-
-                // Display each entry
-                sortedData.forEach((entry, index) => {
-                    // Calculate position for this entry
-                    const entryY = startY + (index * entryHeight);
-
-                    // Player name (left-aligned)
-                    this.add.text(
-                        leaderboardX - leaderboardWidth * 0.25,
-                        entryY,
-                        `${entry.name}`, {
-                            fontFamily: "PoppinsExtraBold",
-                            fontSize: "20px",
-                            fill: "#000"
-                        }
-                    ).setOrigin(0, 0.5);
-
-                    // Player score (right-aligned)
-                    this.add.text(
-                        leaderboardX + leaderboardWidth * 0.27,
-                        entryY,
-                        entry.score.toString(), {
-                            fontFamily: "PoppinsExtraBold",
-                            fontSize: "20px",
-                            fill: "#000"
-                        }
-                    ).setOrigin(1, 0.5);
-                })
-            }
-        }
-
         const config = {
             type: Phaser.AUTO,
             width: 480, // Portrait width (mobile size)
-            height: 800, // Portrait height (tablet size)
+            height: 750, // Portrait height (tablet size)
             backgroundColor: "#ffffff",
-            parent: "game-container", // Bind the game to the container
-            scene: [MainMenuScene, GamePlayScene, GameOverScene],
+            parent: "phaser-game", // Bind the game to the container
+            scene: [GamePlayScene],
             physics: {
                 default: "arcade",
                 arcade: {

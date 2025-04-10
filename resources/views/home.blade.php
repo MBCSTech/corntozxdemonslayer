@@ -95,19 +95,21 @@
                 transform: scale(1);
                 opacity: 1;
             }
+
             50% {
                 transform: scale(1.1);
                 opacity: 0.8;
             }
+
             100% {
                 transform: scale(1);
                 opacity: 1;
             }
-            }
+        }
 
         .pulse {
             animation: pulse 1.5s ease-in-out infinite;
-            }
+        }
 
         @media only screen and (max-width: 380px) {
             .instruction-section {

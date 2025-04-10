@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\GameController;
 use App\Http\Controllers\PlayerFormController;
 use App\Http\Controllers\PlayersController;
 use App\Http\Controllers\ProfileController;
@@ -10,9 +11,15 @@ Route::get('/', function () {
     return view('home');
 })->name('home');
 
-Route::get('/game', function () {
+Route::get('/intro', function(){
+    return view('intro');
+})->name('intro');
+
+Route::get('/game', function(){
     return view('game');
 })->name('game');
+
+Route::get('/leaderboard', [GameController::class, 'index'])->name('leaderboard');
 
 Route::post('/save-score', function (Request $request) {
     session(['last_game_score' => $request->score]);

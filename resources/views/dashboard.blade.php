@@ -135,29 +135,29 @@
                                             <td>{{ $user->no_fon }}</td>
                                             <td>{{ $user->score ?? '-' }}</td>
                                             <td>
-                                                @if ($user->resit)
+                                                @if ($user->receipt)
                                                     @php
-                                                        $fileExtension = pathinfo($user->resit, PATHINFO_EXTENSION);
+                                                        $fileExtension = pathinfo($user->receipt, PATHINFO_EXTENSION);
                                                     @endphp
 
                                                     @if (in_array($fileExtension, ['jpg', 'jpeg', 'png', 'gif']))
                                                         <!-- Render Image -->
                                                         <a href="#"
-                                                            onclick="showReceipt('{{ asset('storage/' . $user->resit) }}', 'image')">
+                                                            onclick="showReceipt('{{ asset('storage/' . $user->receipt) }}', 'image')">
                                                             <img class="w-[4rem]"
-                                                                src="{{ asset('storage/' . $user->resit) }}"
+                                                                src="{{ asset('storage/' . $user->receipt) }}"
                                                                 alt="Resit">
                                                         </a>
                                                     @elseif ($fileExtension === 'pdf')
                                                         <!-- Render PDF Thumbnail using PDF.js -->
                                                         <a href="#"
-                                                            onclick="showReceipt('{{ asset('storage/' . $user->resit) }}', 'pdf')">
+                                                            onclick="showReceipt('{{ asset('storage/' . $user->receipt) }}', 'pdf')">
                                                             <canvas id="pdf-thumbnail-{{ $user->id }}"
                                                                 class="w-[4rem] h-[4rem]"></canvas>
                                                         </a>
                                                         <script>
                                                             document.addEventListener('DOMContentLoaded', function() {
-                                                                var url = "{{ asset('storage/' . $user->resit) }}";
+                                                                var url = "{{ asset('storage/' . $user->receipt) }}";
                                                                 var canvas = document.getElementById('pdf-thumbnail-{{ $user->id }}');
                                                                 var ctx = canvas.getContext('2d');
                                                                 pdfjsLib.getDocument(url).promise.then(function(pdf) {
