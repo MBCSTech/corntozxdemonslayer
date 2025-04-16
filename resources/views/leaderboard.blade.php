@@ -45,10 +45,18 @@
 
         /* Score container with relative positioning */
         .score-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: relative;
-            width: 80%;
+            height: 9rem;
+            width: 75%;
             max-width: 500px;
-            margin: 0 auto;
+            text-align: center;
+            background: url('/assets/endscoreboard.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
         }
 
         .score-container img {
@@ -60,12 +68,9 @@
         /* Text positioned relative to its container */
         .score-text {
             font-family: "PoppinsExtraBoldItalic", sans-serif;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(33%, -39%) rotate(-3deg);
-            font-size: clamp(2.5rem, 5vw, 2.5rem);
+            font-size: clamp(2rem, 5vw, 2.5rem);
             color: #fff;
+            transform: translate(20px, 6%);
             white-space: nowrap;
         }
 
@@ -85,7 +90,7 @@
             position: relative;
             width: 100%;
             transform: translate(-1%, 0);
-            max-width: 500px;
+            max-width: 600px;
             margin: -40px auto 0;
         }
 
@@ -98,13 +103,13 @@
         /* Leaders list styles */
         .leaderboard-entries {
             position: absolute;
-            top: 53%;
+            top: 56%;
             left: 12%;
             right: -7%;
             display: flex;
             flex-direction: column;
             padding: 0 15%;
-            gap: 0.5rem;
+            gap: 1.25rem;
         }
 
         .leader-row {
@@ -125,7 +130,7 @@
             flex-direction: column;
             gap: 1rem;
             width: 100%;
-            max-width: 300px;
+            max-width: 500px;
             margin: 1rem auto;
         }
 
@@ -137,13 +142,80 @@
         }
 
         /* Responsive adjustments */
-        /* @media (max-width: 768px) {
+        @media (min-width: 768px) {
+            .score-container {
+                height: 16rem;
+            }
+
+            .score-text {
+                transform: translate(36px, 14%);
+            }
+
+            .leaderboard-container {
+                max-width: 70%;
+            }
+
             .leaderboard-entries {
-                padding: 0 18%;
+                top: 55%;
+                gap: 1.25rem;
+            }
+
+        }
+
+        @media (min-width: 900px) {
+            .leaderboard-entries {
+                gap: 2rem;
             }
         }
 
-        @media (max-width: 480px) {
+        @media (min-width: 1024px) {
+
+            .buttons {
+                flex-direction: row;
+                max-width: 50%;
+            }
+
+            .leaderboard-container {
+                max-width: 50%;
+            }
+
+            .leaderboard-entries {
+                top: 57%;
+                gap: 1rem;
+            }
+
+            .bg {
+                background-image: url('/assets/bg-desktop.png');
+                background-size: cover;
+                background-position: center;
+            }
+        }
+
+        @media (min-width: 1280px) {
+            .leaderboard-entries {
+                gap: 1.5rem;
+            }
+        }
+
+        @media (min-width: 1440px) {
+            .leaderboard-entries {
+                gap: 2rem;
+            }
+        }
+
+        @media (min-width: 1440px) {
+            .leaderboard-entries {
+                gap: 2.5rem;
+            }
+        }
+
+        @media (min-width: 1780px) {
+            .leaderboard-entries {
+                gap: 3.5rem;
+            }
+        }
+
+        /* @media (max-width: 480px) {
             .leaderboard-entries {
                 padding: 0 20%;
                 top: 35%;
@@ -157,14 +229,10 @@
 
         <!-- Score with container to keep text aligned with image -->
         <div class="score-container">
-            <img src="/assets/endscoreboard.png" alt="score">
+            {{-- <img src="/assets/endscoreboard.png" alt="score"> --}}
             <h4 class="score-text">{{ $score }}</h4>
         </div>
 
-        <!-- Week indicator (optional) -->
-        {{-- <div class="week-indicator">
-            {{ $currentWeek }}
-        </div> --}}
 
         <!-- Leaderboard with container to keep text aligned with image -->
         <div class="leaderboard-container">

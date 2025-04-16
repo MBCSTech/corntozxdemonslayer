@@ -26,14 +26,14 @@ class PlayerFormFactory extends Factory
     public function definition(): array
     {
         $weeks = [
-            'Week1' => ['start' => '2024-06-01', 'end' => '2024-06-14'],
-            'Week2' => ['start' => '2024-06-15', 'end' => '2024-06-28'],
-            'Week3' => ['start' => '2024-06-29', 'end' => '2024-07-12'],
-            'Week4' => ['start' => '2024-07-13', 'end' => '2024-07-26'],
-            'Week5' => ['start' => '2024-07-27', 'end' => '2024-08-09'],
-            'Week6' => ['start' => '2024-08-10', 'end' => '2024-08-23'],
-            'Week7' => ['start' => '2024-08-24', 'end' => '2024-09-06'],
-            'Week8' => ['start' => '2024-09-07', 'end' => '2024-09-13']
+            'Week1' => ['start' => '2024-06-01', 'end' => '2024-06-08'],
+            'Week2' => ['start' => '2024-06-09', 'end' => '2024-06-15'],
+            'Week3' => ['start' => '2024-06-16', 'end' => '2024-06-22'],
+            'Week4' => ['start' => '2024-06-23', 'end' => '2024-06-29'],
+            'Week5' => ['start' => '2024-06-30', 'end' => '2024-07-06'],
+            'Week6' => ['start' => '2024-07-07', 'end' => '2024-07-13'],
+            'Week7' => ['start' => '2024-07-14', 'end' => '2024-07-20'],
+            'Week8' => ['start' => '2024-07-21', 'end' => '2024-07-31']
         ];
 
         $selectedWeek = $this->faker->randomElement(array_keys($weeks));
@@ -93,14 +93,14 @@ class PlayerFormFactory extends Factory
     public function forWeek(string $week): Factory
     {
         $weeks = [
-            'Week1' => ['start' => '2024-06-01', 'end' => '2024-06-14'],
-            'Week2' => ['start' => '2024-06-15', 'end' => '2024-06-28'],
-            'Week3' => ['start' => '2024-06-29', 'end' => '2024-07-12'],
-            'Week4' => ['start' => '2024-07-13', 'end' => '2024-07-26'],
-            'Week5' => ['start' => '2024-07-27', 'end' => '2024-08-09'],
-            'Week6' => ['start' => '2024-08-10', 'end' => '2024-08-23'],
-            'Week7' => ['start' => '2024-08-24', 'end' => '2024-09-06'],
-            'Week8' => ['start' => '2024-09-07', 'end' => '2024-09-13']
+            'Week1' => ['start' => '2024-06-01', 'end' => '2024-06-08'],
+            'Week2' => ['start' => '2024-06-09', 'end' => '2024-06-15'],
+            'Week3' => ['start' => '2024-06-16', 'end' => '2024-06-22'],
+            'Week4' => ['start' => '2024-06-23', 'end' => '2024-06-29'],
+            'Week5' => ['start' => '2024-06-30', 'end' => '2024-07-06'],
+            'Week6' => ['start' => '2024-07-07', 'end' => '2024-07-13'],
+            'Week7' => ['start' => '2024-07-14', 'end' => '2024-07-20'],
+            'Week8' => ['start' => '2024-07-21', 'end' => '2024-07-31']
         ];
 
         return $this->state(function (array $attributes) use ($week, $weeks) {

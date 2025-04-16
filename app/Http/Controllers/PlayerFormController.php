@@ -18,7 +18,12 @@ class PlayerFormController extends Controller
     {
         // Validate the incoming request
         $validated = $request->validate([
-            'nama' => 'required|string|max:100',
+            'nama' => [
+                'required',
+                'string',
+                'max:100',
+                'regex:/^[a-zA-Z\s]+$/', // Only allow letters and spaces
+            ],
             'no_ic' => [
                 'required',
                 function ($attribute, $value, $fail) {
@@ -40,23 +45,29 @@ class PlayerFormController extends Controller
                         $fail('Sila gunakan nombor sahaja.');
                     }
                 },
+                function ($attribute, $value, $fail) {
+                    if (strpos($value, '-') !== false) {
+                        $fail('Sila gunakan nombor telefon yang sah tanpa tanda (-).');
+                    }
+                },
                 'regex:/^[0-9\-]+$/',
                 'min:10',
                 'max:15',
             ],
             'receipt' => 'required|file|mimes:jpeg,png,jpg,pdf|max:3072',
         ], [
-            'nama.required' => 'Sila masukkan nama penuh anda.',
-            'no_ic.required' => 'Sila masukkan nombor kad pengenalan anda.',
-            'no_ic.digits' => 'Nombor kad pengenalan mestilah 12 digit.',
-            'no_fon.required' => 'Sila masukkan nombor telefon anda.',
-            'no_fon.regex' => 'Format nombor telefon tidak sah.',
+            'nama.required' => 'Sila isi ruangan ini.',
+            'nama.regex' => 'Sila gunakan huruf sahaja.',
+            'no_ic.required' => 'Sila isi ruangan ini.',
+            'no_ic.digits' => 'Sila panjangkan teks ini kepada 12 aksara atau lebih.',
+            'no_fon.required' => 'Sila isi ruangan ini.',
+            'no_fon.regex' => 'Sila gunakan format nombor telefon yang sah, cth: 012.',
             'no_fon.min' => 'Nombor telefon terlalu pendek.',
             'no_fon.max' => 'Nombor telefon terlalu panjang.',
-            'receipt.required' => 'Sila muat naik resit anda.',
+            'receipt.required' => 'Sila lampirkan resit anda.',
             'receipt.file' => 'Fail tidak sah.',
-            'receipt.mimes' => 'Format fail tidak disokong. Gunakan jpeg, png, jpg, atau pdf.',
-            'receipt.max' => 'Saiz fail terlalu besar. Had maksimum 3MB.',
+            'receipt.mimes' => 'Sila ikut format yang diminta.',
+            'receipt.max' => 'Resit melibihi saiz yang ditetapkan.',
         ]);
 
 
@@ -70,56 +81,56 @@ class PlayerFormController extends Controller
         switch (true) {
             case $today->between(
                 Carbon::parse('2024-06-01')->setTime(0, 0, 0),
-                Carbon::parse('2024-06-14')->setTime(23, 59, 59)
+                Carbon::parse('2024-06-08')->setTime(23, 59, 59)
             ):
                 $week = 'Week1';
                 break;
 
             case $today->between(
-                Carbon::parse('2024-06-15')->setTime(0, 0, 0),
-                Carbon::parse('2024-06-28')->setTime(23, 59, 59)
+                Carbon::parse('2024-06-09')->setTime(0, 0, 0),
+                Carbon::parse('2024-06-15')->setTime(23, 59, 59)
             ):
                 $week = 'Week2';
                 break;
 
             case $today->between(
-                Carbon::parse('2024-06-29')->setTime(0, 0, 0),
-                Carbon::parse('2024-07-12')->setTime(23, 59, 59)
+                Carbon::parse('2024-06-16')->setTime(0, 0, 0),
+                Carbon::parse('2024-06-22')->setTime(23, 59, 59)
             ):
                 $week = 'Week3';
                 break;
 
             case $today->between(
-                Carbon::parse('2024-07-13')->setTime(0, 0, 0),
-                Carbon::parse('2024-07-26')->setTime(23, 59, 59)
+                Carbon::parse('2024-06-23')->setTime(0, 0, 0),
+                Carbon::parse('2024-06-29')->setTime(23, 59, 59)
             ):
                 $week = 'Week4';
                 break;
 
             case $today->between(
-                Carbon::parse('2024-07-27')->setTime(0, 0, 0),
-                Carbon::parse('2024-08-09')->setTime(23, 59, 59)
+                Carbon::parse('2024-06-30')->setTime(0, 0, 0),
+                Carbon::parse('2024-07-06')->setTime(23, 59, 59)
             ):
                 $week = 'Week5';
                 break;
 
             case $today->between(
-                Carbon::parse('2024-08-10')->setTime(0, 0, 0),
-                Carbon::parse('2024-08-23')->setTime(23, 59, 59)
+                Carbon::parse('2024-07-07')->setTime(0, 0, 0),
+                Carbon::parse('2024-07-13')->setTime(23, 59, 59)
             ):
                 $week = 'Week6';
                 break;
 
             case $today->between(
-                Carbon::parse('2024-08-24')->setTime(0, 0, 0),
-                Carbon::parse('2024-09-06')->setTime(23, 59, 59)
+                Carbon::parse('2024-07-14')->setTime(0, 0, 0),
+                Carbon::parse('2024-07-20')->setTime(23, 59, 59)
             ):
                 $week = 'Week7';
                 break;
 
             case $today->between(
-                Carbon::parse('2024-09-07')->setTime(0, 0, 0),
-                Carbon::parse('2024-09-13')->setTime(23, 59, 59)
+                Carbon::parse('2024-07-21')->setTime(0, 0, 0),
+                Carbon::parse('2024-07-31')->setTime(23, 59, 59)
             ):
                 $week = 'Week8';
                 break;

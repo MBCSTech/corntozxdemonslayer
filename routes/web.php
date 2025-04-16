@@ -15,11 +15,12 @@ Route::get('/intro', function(){
     return view('intro');
 })->name('intro');
 
+Route::get('/leaderboard', [GameController::class, 'index'])->name('leaderboard');
+
 Route::get('/game', function(){
     return view('game');
 })->name('game');
 
-Route::get('/leaderboard', [GameController::class, 'index'])->name('leaderboard');
 
 Route::post('/save-score', function (Request $request) {
     session(['last_game_score' => $request->score]);
@@ -31,7 +32,7 @@ Route::post('/form-submission', [PlayerFormController::class, 'store'])->name('p
 
 Route::get('/confirm', function () {
     return view('confirmation');
-})->name('game');
+})->name('confirm');
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [PlayersController::class, 'show'])->name('dashboard');

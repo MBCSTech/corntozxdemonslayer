@@ -93,6 +93,18 @@
                                 <button onclick="downloadAllImages('Week4')" class="dropdown-item">
                                     {{ __('Week 4') }}
                                 </button>
+                                <button onclick="downloadAllImages('Week4')" class="dropdown-item">
+                                    {{ __('Week 5') }}
+                                </button>
+                                <button onclick="downloadAllImages('Week4')" class="dropdown-item">
+                                    {{ __('Week 6') }}
+                                </button>
+                                <button onclick="downloadAllImages('Week4')" class="dropdown-item">
+                                    {{ __('Week 7') }}
+                                </button>
+                                <button onclick="downloadAllImages('Week4')" class="dropdown-item">
+                                    {{ __('Week 8') }}
+                                </button>
                             </div>
                         </div>
                         <button onclick="exportToCSV()"

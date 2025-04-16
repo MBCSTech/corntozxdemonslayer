@@ -10,7 +10,7 @@
         #game-container {
             position: relative;
             width: 100%;
-            max-width: 480px;
+            /* max-width: 480px; */
             overflow: hidden;
         }
 
@@ -31,6 +31,36 @@
             width: 100%;
             height: 100%;
             z-index: 1;
+        }
+
+        @media only screen and (min-width: 728px) {
+
+            #game-container {
+                height: calc(100vh - 64px);
+            }
+
+            #game-background {
+                background: #FF6FAC;
+
+            }
+
+            #game-container canvas {
+                background: url('assets/bg.png');
+                background-position: center;
+                background-size: cover;
+            }
+
+            #phaser-game canvas {
+                border: 2px solid #000;
+            }
+        }
+
+        @media only screen and (min-width: 1024px) {
+
+            #game-container {
+                max-width: 100%;
+
+            }
         }
     </style>
 
@@ -61,15 +91,19 @@
                 this.slashActive = false; // Flag to control active slashing
 
                 // Difficulty properties
-                this.difficultyLevel = 1; // Starting difficulty level
-                this.lastDifficultyIncrease = 0; // Track when difficulty was last increased
-                this.difficultyIncreaseInterval = 10; // Seconds between difficulty increases
-                this.spawnDelay = 1000; // Initial spawn delay in milliseconds
-                this.minSpawnDelay = 300; // Minimum spawn delay (for highest difficulty)
-                this.baseObjectSpeed = 500; // Base vertical speed for objects
-                this.speedIncreasePerLevel = 50; // How much to increase speed per level
-                this.bombProbability = 0.2; // Starting probability of spawning a bomb
-                this.maxBombProbability = 0.35; // Maximum bomb probability at highest difficulty
+                this.difficultyLevel = 1;
+                this.lastDifficultyIncrease = 0;
+                this.difficultyIncreaseInterval = 10;
+                this.spawnDelay = 1000;
+                this.minSpawnDelay = 300;
+                this.baseObjectSpeed = 500;
+                this.speedIncreasePerLevel = 50;
+                this.bombProbability = 0.2;
+                this.maxBombProbability = 0.35;
+
+                this.maxObjectsOnScreen = 10; // Maximum number of objects allowed at once
+                this.activeSpawnEvents = 0; // Track number of scheduled spawn events
+                this.maxActiveSpawnEvents = 3; // Limit concurrent spawn events
             }
 
             preload() {
@@ -81,6 +115,8 @@
                 // this.load.image("background", "assets/bg.png");
                 this.load.image("snack", "assets/snack.png");
                 this.load.image("snack2", "assets/snack2.png");
+                this.load.image("mute", "assets/mute.png");
+                this.load.image("unmute", "assets/unmute.png");
                 this.load.image("snack3", "assets/snack3.png");
                 this.load.image("bomb", "assets/bomb2.png");
                 this.load.audio("slice", "assets/slice.mp3");
@@ -123,6 +159,15 @@
                     })
                     .setOrigin(0.5)
                     .setAngle(-14);
+
+                this.muteButton = this.add
+                    .image(0.9 * config.width, 0.2 * config.height, isMuted ? "mute" : "unmute")
+                    .setScale(2)
+                    .setInteractive({
+                        useHandCursor: true
+                    })
+                    .on("pointerdown", this.toggleMute, this)
+                    .setDepth(100);
 
                 // Level indicator
                 this.levelText = this.add
@@ -213,6 +258,25 @@
                 this.spawnObjects();
 
                 // Instead of a fixed timer, we'll handle spawning dynamically in the update method
+            }
+
+            toggleMute() {
+                isMuted = !isMuted;
+
+                // Update button texture based on mute state
+                this.muteButton.setTexture(isMuted ? "mute" : "unmute");
+
+                // Set global sound mute state
+                this.sound.mute = isMuted;
+
+                // Add a small feedback effect
+                this.tweens.add({
+                    targets: this.muteButton,
+                    scale: 0.6,
+                    duration: 100,
+                    yoyo: true,
+                    ease: 'Power1'
+                });
             }
 
             updateTrail(pointer) {
@@ -444,17 +508,21 @@
 
             updateCountdown() {
                 if (this.isGameEnding) return;
+
                 countdown--; // Decrement the countdown
                 this.countdownText.setText(countdown); // Update the countdown text
 
+                // First check if the countdown has reached zero
+                if (countdown <= 0) {
+                    this.endGame('timeout'); // Specify 'timeout' as reason
+                    return; // Stop processing - don't update difficulty if game is ending
+                }
+
                 // Check for difficulty increase every difficultyIncreaseInterval seconds
+                // Only if the countdown is still positive
                 const elapsedGameTime = Math.floor((this.time.now - this.gameStartTime) / 1000);
                 if (elapsedGameTime >= this.lastDifficultyIncrease + this.difficultyIncreaseInterval) {
                     this.increaseDifficulty();
-                }
-
-                if (countdown <= 0) {
-                    this.endGame('timeout'); // Specify 'timeout' as reason (or use default)
                 }
             }
 
@@ -516,11 +584,28 @@
             }
 
             spawnObjects() {
+                // Check if we should spawn more objects based on limits
+                const currentObjectCount = this.fruits.getChildren().length + this.bombs.getChildren().length;
+
+                if (currentObjectCount >= this.maxObjectsOnScreen || this.isGameEnding) {
+                    // If we've reached max objects, schedule another attempt later
+                    this.time.delayedCall(500, () => {
+                        if (!this.isGameEnding) {
+                            this.activeSpawnEvents--;
+                            this.spawnObjects();
+                        }
+                    });
+                    return;
+                }
+
+                // Track active spawn event
+                this.activeSpawnEvents++;
+
                 const fruits = ["snack", "snack2", "snack3"];
                 const randomFruit = Phaser.Utils.Array.GetRandom(fruits);
 
-                const x = Phaser.Math.Between(50, 430); // Random horizontal position
-                const y = 900; // Spawn off-screen at the bottom
+                const x = Phaser.Math.Between(50, 430);
+                const y = 900;
 
                 // Calculate current object speed based on difficulty
                 const currentSpeed = this.baseObjectSpeed + (this.difficultyLevel - 1) * this.speedIncreasePerLevel;
@@ -549,7 +634,12 @@
                 }
 
                 // At higher levels, spawn additional objects occasionally
-                if (this.difficultyLevel >= 3 && Math.random() > 0.7) {
+                // But only if we haven't reached our active event limit
+                if (this.difficultyLevel >= 3 &&
+                    Math.random() > 0.7 &&
+                    currentObjectCount < this.maxObjectsOnScreen - 1 &&
+                    this.activeSpawnEvents < this.maxActiveSpawnEvents) {
+
                     this.time.delayedCall(200, () => {
                         if (!this.isGameEnding) {
                             this.spawnObjects();
@@ -560,7 +650,12 @@
                 // Schedule next spawn based on current spawn delay
                 this.time.delayedCall(this.spawnDelay, () => {
                     if (!this.isGameEnding) {
+                        // Reduce active spawn count and attempt another spawn
+                        this.activeSpawnEvents--;
                         this.spawnObjects();
+                    } else {
+                        // Game ending, reduce counter without spawning
+                        this.activeSpawnEvents--;
                     }
                 });
             }
@@ -578,6 +673,10 @@
                         bomb.destroy();
                     }
                 });
+
+                // Dynamically adjust max objects based on difficulty level
+                // More objects allowed at higher levels, but with a reasonable cap
+                this.maxObjectsOnScreen = 8 + Math.min(7, this.difficultyLevel);
             }
 
             endGame(reason = 'timeout') {
@@ -754,7 +853,7 @@
                 },
             },
             scale: {
-                mode: Phaser.Scale.EXPAND,
+                mode: Phaser.Scale.FIT,
                 autoCenter: Phaser.Scale.CENTER_BOTH, // Center the game within the container
                 min: {
                     width: 320, // Minimum width for mobile
