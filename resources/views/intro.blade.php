@@ -80,18 +80,23 @@
 
             .bg-desktop {
                 display: flex;
+                min-height: 100vh;
                 flex-direction: column;
-                background-image: url('/assets/bg-desktop.png');
+                background-image: url('/assets/intro-bg-desktop.png');
                 background-size: cover;
-                background-position: center;
+                background-position: center -25px;
                 align-items: center;
                 gap: .5rem
             }
 
             .masthead img,
             .samurai-pinko img {
-                width: 75%;
+                width: 60%;
                 max-width: 1024px;
+            }
+
+            .samurai-pinko img {
+                scale: 0.9
             }
 
             .instructions img{
@@ -104,6 +109,24 @@
                 max-width: 768px;
             }
 
+        }
+
+        @media only screen and (min-width: 1440px) {
+            .bg-desktop{
+                background-position: center -50px;
+            }
+        }
+
+        @media only screen and (min-width: 1830px) {
+            .bg-desktop{
+                background-position: center -80px;
+            }
+        }
+
+        @media only screen and (min-width: 1920px) {
+            .bg-desktop{
+                background-position: center -110px;
+            }
         }
     </style>
     <div class="bg">
@@ -126,7 +149,7 @@
             <img src="/assets/masthead.png" alt="mast">
         </div>
         <div class="samurai-pinko">
-            <img src="/assets/samurai-pinko-desktop.png" alt="pinko">
+            <img src="/assets/intro-samurai-pinko-desktop.png" alt="pinko">
         </div>
         <div class="start-button pulse">
             <a href="/game"><img src="/assets/start-button.png" alt="start"></a>

@@ -49,7 +49,7 @@ class PlayerFormFactory extends Factory
             'no_ic' => $this->faker->numerify('##########'), // Assuming a 10-digit IC number
             'no_fon' => $this->faker->numerify('+60#########'), // Malaysian phone number format
             'score' => $this->faker->numberBetween(0, 1000),
-            'receipt' => $this->faker->optional()->uuid(), // Optional receipt reference
+            'receipt' => 'uid81_989029490282.png', // Optional receipt reference
             'week' => $selectedWeek,
             'created_at' => $createdAt,
             'updated_at' => $this->faker->dateTimeBetween($createdAt, 'now'),
@@ -79,7 +79,7 @@ class PlayerFormFactory extends Factory
     {
         return $this->state(function (array $attributes) {
             return [
-                'receipt' => null,
+                'receipt' => 'resit/uid81_989029490282.png',
             ];
         });
     }

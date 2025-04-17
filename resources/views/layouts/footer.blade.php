@@ -15,6 +15,8 @@
     .footer-cont {
         display: flex;
         justify-content: center;
+        vertical-align: middle;
+        align-items: center;
     }
 
     .footer-cont img {
@@ -49,21 +51,11 @@
 
     @media screen and (min-width: 1200px) {
         .footer-div {
-            font-size: 16px;
+            font-size: 12px;
         }
 
         .footer-cont img {
-            width: 6%;
-        }
-    }
-
-    @media screen and (min-width: 1400px) {
-        .footer-div {
-            font-size: 20px;
-        }
-
-        .footer-cont img {
-            width: 5%;
+            width: 4%;
         }
     }
 </style>

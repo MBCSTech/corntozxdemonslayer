@@ -1,15 +1,4 @@
 <style>
-    *,
-    *::after,
-    *::before {
-        box-sizing: border-box;
-        padding: 0;
-        margin: 0;
-    }
-
-    .html {
-        font-size: 62.5%;
-    }
 
     .navbars input[type="checkbox"],
     .navbars .hamburger-lines {
@@ -17,8 +6,8 @@
     }
 
     .container {
-        max-width: 1000px;
-        width: 90%;
+        max-width: 1200px;
+        width: 58%;
         margin: auto;
     }
 
@@ -28,14 +17,17 @@
         background: #E94A93;
         color: #FFFFFF;
         z-index: 100;
-        font-family: 'Poppins', sans-serif;
-        font-weight: 800;
+    }
+
+    .navbars a{
+        font-family: 'PoppinsBlack', sans-serif;
+        
     }
 
     .navbar-container {
         display: flex;
         justify-content: space-between;
-        height: 75px;
+        height: 85px;
         align-items: center;
     }
 
@@ -46,19 +38,24 @@
 
     .logo {
         order: 1;
-        width: 19%;
+        width: 23%;
     }
 
     .menu-items li {
         list-style: none;
         margin-left: 0;
         margin-right: 0;
-        font-size: 1.3rem;
+        font-size: 1rem;
         background-color: #E94A93;
         padding: 8px 0;
         padding-right: 5px;
-        padding-left: 23px;
+        padding-left: 60px;
         border-radius: 20px;
+    }
+
+    .menu-items li:nth-child(2),
+    .menu-items li:nth-child(3) {
+        padding-left: 10px;
     }
 
     .menu-items {
@@ -82,6 +79,11 @@
     }
 
     @media (max-width: 768px) {
+        .container {
+            max-width: 1200px;
+            width: 90%;
+            margin: auto;
+        }
 
         .navbar-container input[type="checkbox"],
         .navbar-container .hamburger-lines {
@@ -151,6 +153,7 @@
             flex-direction: column;
             margin-left: -40px;
             padding-left: 40px;
+            padding-right: 20px;
             transition: transform 0.5s ease-in-out;
             overflow: scroll;
         }
@@ -159,6 +162,11 @@
             margin-bottom: 1.8rem;
             font-size: 14px;
             font-weight: 500;
+            padding: 15px 0px;
+            padding-left: 30px;
+            border-radius: 30px;
+            margin-bottom: 10px;
+
         }
 
         .logo {
@@ -191,6 +199,9 @@
             margin-right: 8px;
         }
 
+        .menu-items li:nth-child(3) .navbar-icons {
+            width: 8%;
+        }
     }
 
     @media (max-width: 500px) {
@@ -201,22 +212,45 @@
 
     @media screen and (min-width: 769px) and (max-width: 992px) {
         .container {
-            max-width: 800px;
+            width: 92%;
         }
 
         .navbars .menu-items li {
-            font-size: 1rem;
-            padding-left: 6px;
+            font-size: 0.8rem;
+            padding-left: 20px;
         }
     }
 
     @media screen and (min-width: 993px) and (max-width: 1200px) {
         .container {
-            max-width: 900px;
+            width: 90%;
         }
 
         .navbars .menu-items li {
-            font-size: 1.1rem;
+            font-size: 0.9rem;
+            padding-left: 40px;
+        }
+    }
+
+    @media screen and (min-width: 1201px) and (max-width: 1300px) {
+        .container {
+            width: 78%;
+        }
+
+        .navbars .menu-items li {
+            font-size: 1rem;
+            padding-left: 40px;
+        }
+    }
+
+    @media screen and (min-width: 1301px) and (max-width: 1400px) {
+        .container {
+            width: 75%;
+        }
+
+        .navbars .menu-items li {
+            font-size: 1rem;
+            padding-left: 50px;
         }
     }
 </style>

@@ -50,9 +50,6 @@
                 background-size: cover;
             }
 
-            #phaser-game canvas {
-                border: 2px solid #000;
-            }
         }
 
         @media only screen and (min-width: 1024px) {
@@ -162,7 +159,7 @@
 
                 this.muteButton = this.add
                     .image(0.9 * config.width, 0.2 * config.height, isMuted ? "mute" : "unmute")
-                    .setScale(2)
+                    .setScale(0.5)
                     .setInteractive({
                         useHandCursor: true
                     })
@@ -691,6 +688,32 @@
                 // Pause physics to freeze objects in place
                 this.physics.pause();
 
+                // Disable all input to prevent touching objects after game ends
+                this.input.enabled = false;
+
+                // Remove all input listeners to prevent further slice checks
+                this.input.off('pointerdown');
+                this.input.off('pointermove');
+                this.input.off('pointerup');
+
+                // Make all existing objects non-interactive
+                this.fruits.getChildren().forEach(fruit => {
+                    if (fruit.input) fruit.input.enabled = false;
+                });
+
+                this.bombs.getChildren().forEach(bomb => {
+                    if (bomb.input) bomb.input.enabled = false;
+                });
+
+                // Clear any active slicing graphics
+                if (this.sliceGraphics) this.sliceGraphics.clear();
+                if (this.glowGraphics) this.glowGraphics.clear();
+
+                // Reset slashing state
+                this.slashActive = false;
+                this.swipeStart = null;
+                this.trailPoints = [];
+
                 // Create a semi-transparent black overlay
                 const overlay = this.add.rectangle(240, 400, 480, 800, 0x000000, 0)
                     .setDepth(2000)
@@ -838,7 +861,7 @@
         const config = {
             type: Phaser.AUTO,
             width: 480, // Portrait width (mobile size)
-            height: 750, // Portrait height (tablet size)
+            height: 900, // Portrait height (tablet size)
             backgroundColor: "transparent",
             transparent: true,
             parent: "phaser-game", // Bind the game to the container
@@ -861,7 +884,7 @@
                 },
                 max: {
                     width: 480, // Maximum width for tablet
-                    height: 800,
+                    height: 900,
                 },
             },
         };

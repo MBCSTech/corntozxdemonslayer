@@ -12,7 +12,7 @@ class PlayersController extends Controller
     {
         $startDate = $request->input('start_date');
         $endDate = $request->input('end_date');
-        $week = $request->input('puzzle_version');
+        $week = $request->input('week');
 
         // Build the query
         $query = PlayerForm::query();
@@ -26,7 +26,7 @@ class PlayersController extends Controller
         }
 
         if ($week) {
-            $query->where('puzzle_version', $week);
+            $query->where('week', $week);
         }
 
         $query->orderBy('created_at', 'desc');
@@ -42,7 +42,7 @@ class PlayersController extends Controller
                     'IC Number' => $user->no_ic,
                     'Phone Number' => $user->no_fon,
                     'Score' => $user->score,
-                    'Receipt_Name' => explode("/", $user->resit ?? '')[1] ?? null,
+                    'Receipt_Name' => explode("/", $user->receipt ?? '')[1] ?? null,
                 ];
             }));
         }

@@ -13,6 +13,7 @@
             gap: 0.5rem;
             position: relative;
             padding: 1rem;
+            overflow: hidden;
         }
 
         .bg::before {
@@ -70,7 +71,7 @@
             font-family: "PoppinsExtraBoldItalic", sans-serif;
             font-size: clamp(2rem, 5vw, 2.5rem);
             color: #fff;
-            transform: translate(20px, 6%);
+            transform: translate(38px, 6%);
             white-space: nowrap;
         }
 
@@ -103,13 +104,13 @@
         /* Leaders list styles */
         .leaderboard-entries {
             position: absolute;
-            top: 56%;
+            top: 55%;
             left: 12%;
             right: -7%;
             display: flex;
             flex-direction: column;
             padding: 0 15%;
-            gap: 1.25rem;
+            gap: 0.2rem;
         }
 
         .leader-row {
@@ -142,13 +143,21 @@
         }
 
         /* Responsive adjustments */
+
+        @media (min-width: 375px) {
+            .leaderboard-entries {
+                top: 56%;
+                gap: 0.6rem;
+            }
+        }
+
         @media (min-width: 768px) {
             .score-container {
                 height: 16rem;
             }
 
             .score-text {
-                transform: translate(36px, 14%);
+                transform: translate(63px, 14%);
             }
 
             .leaderboard-container {
@@ -194,6 +203,10 @@
         @media (min-width: 1280px) {
             .leaderboard-entries {
                 gap: 1.5rem;
+            }
+
+            .score-text{
+                transform: translate(66px, 14%)
             }
         }
 

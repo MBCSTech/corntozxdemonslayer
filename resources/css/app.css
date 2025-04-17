@@ -18,6 +18,11 @@
 }
 
 @font-face {
+    font-family: 'PoppinsBlack';
+    src: url(../fonts/Poppins-Black.ttf);
+}
+
+@font-face {
     font-family: 'PoppinsBlackItalic';
     src: url(../fonts/Poppins-BlackItalic.ttf);
 }

@@ -97,7 +97,7 @@
         .button-wrapper {
             padding-bottom: 80px;
             margin-top: -60px;
-            width: 32%;
+            width: 75%;
             margin-left: auto;
             margin-right: auto;
         }
@@ -232,11 +232,25 @@
         @media only screen and (min-width: 1200px) {
             .instruction-section {
                 background-image: url('/assets/img/instruction-box-desktop.png');
-                height: 68vh;
+                height: 73vh;
+            }
+        }
+
+        @media only screen and (min-width: 1300px) {
+            .instruction-section {
+                background-image: url('/assets/img/instruction-box-desktop.png');
+                height: 74vh;
             }
         }
 
         @media only screen and (min-width: 1400px) {
+            .instruction-section {
+                background-image: url('/assets/img/instruction-box-desktop.png');
+                height: 95vh;
+            }
+        }
+
+        @media only screen and (min-width: 1600px) {
             .instruction-section {
                 background-image: url('/assets/img/instruction-box-desktop.png');
                 height: 92vh;

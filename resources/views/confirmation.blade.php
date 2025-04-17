@@ -1,9 +1,5 @@
 <x-site-layout>
     <style>
-        .navbars {
-            position: sticky;
-        }
-
         .top-section {
             background-image: url('/assets/img/background-confirm-mobile.png');
             background-size: 100% 100%;
@@ -39,7 +35,9 @@
             width: 80%;
             margin-top: 15px;
             position: relative;
-            display: block;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -151,7 +149,7 @@
             }
         }
 
-        @media screen and (min-width: 1121px) {
+        @media screen and (min-width: 1200px) {
             .top-section {
                 background-image: url('/assets/img/background-confirm-dekstop.png');
                 background-position: center;
@@ -161,7 +159,7 @@
             }
 
             .epiklogo {
-                width: 32%;
+                width: 28%;
                 margin-top: 6%;
             }
 

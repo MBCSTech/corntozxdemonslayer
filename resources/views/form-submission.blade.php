@@ -248,7 +248,6 @@
         }
 
         .error-popup {
-            display: none;
             position: absolute;
             top: 100%;
             left: 20px;
@@ -770,7 +769,7 @@
 
             .top-section {
                 background-image: url('assets/img/background1-desktop.jpg');
-                background-position: top center;
+                background-position: top left;
                 background-repeat: no-repeat;
                 background-size: cover;
                 position: relative;
@@ -783,14 +782,19 @@
                 z-index: 1;
             }
 
+            .score-box{
+                max-width: 700px;
+                width: 100%;
+            }
+
             .score {
-                margin-top: 40px;
+                margin-top: 12px;
                 width: 40%;
                 align-self: flex-start;
             }
 
             .winner {
-                width: 35%;
+                width: 40%;
                 align-self: flex-start;
             }
 
@@ -888,6 +892,19 @@
                 top: 75%;
             }
         }
+
+        .success-popup {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 1000;
+        }
     </style>
 
     <div class="page-container">
@@ -904,15 +921,212 @@
 
             <div class="daftarsekarang">Daftar Sekarang dan Mulakan Pengembaraan Anda!</div>
 
-            <div class="form-container">
-                <form id="myForm" method="POST" action="{{ route('player.store') }}" enctype="multipart/form-data">
+            <div class="form-container" x-data="{
+                nameError: false,
+                nameEmpty: false,
+                fonError: false,
+                fonEmpty: false,
+                fonTooShort: false,
+                fonInvalidChar: false,
+                fonHasDash: false,
+                icError: false,
+                icEmpty: false,
+                resitError: false,
+                fileSizeError: false,
+                fileFormatError: false,
+                fileUploaded: false,
+                fileName: '',
+                fileSize: '',
+            
+                validateResit() {
+                    let file = this.$refs.fileUpload.files[0];
+                    if (!file) {
+                        this.resitError = true;
+                        this.fileName = '';
+                        this.fileSize = '';
+                        return;
+                    }
+            
+                    // Check file size - changed to 1MB (1048576 bytes)
+                    if (file.size > 1048576) {
+                        this.fileSizeError = true;
+                        this.resitError = true;
+                        this.fileFormatError = false;
+                        this.$refs.fileUpload.value = ''; // Clear the input
+                        this.fileName = '';
+                        this.fileSize = '';
+                        setTimeout(() => {
+                            this.fileSizeError = false;
+                        }, 3000);
+                        return;
+                    }
+            
+                    // Check file format/mime type
+                    const acceptedFormats = ['image/jpeg', 'image/png', 'image/jpg', 'application/pdf'];
+                    const fileType = file.type.toLowerCase();
+            
+                    if (!acceptedFormats.includes(fileType)) {
+                        this.fileFormatError = true;
+                        this.resitError = false;
+                        this.fileSizeError = false;
+                        this.$refs.fileUpload.value = ''; // Clear the input
+                        this.fileName = '';
+                        this.fileSize = '';
+                        setTimeout(() => {
+                            this.fileFormatError = false;
+                        }, 3000);
+                        return;
+                    }
+            
+                    // All checks passed
+                    this.fileName = file.name;
+                    this.fileSize = (file.size / 1024).toFixed(2) + ' KB';
+                    this.fileUploaded = true;
+                    this.resitError = false;
+                    this.fileSizeError = false;
+                    this.fileFormatError = false;
+                    setTimeout(() => {
+                        this.fileUploaded = false;
+                    }, 1500);
+                },
+                validateName() {
+                    const name = this.$refs.nama.value.trim();
+                    if (!name) {
+                        this.nameEmpty = true;
+                        this.nameError = false;
+                    } else {
+                        const namePattern = /^[a-zA-Z\s]+$/;
+                        this.nameError = !namePattern.test(name);
+                        this.nameEmpty = false;
+                    }
+                },
+                validateIC() {
+                    const ic = this.$refs.no_ic.value.trim();
+            
+                    if (!ic) {
+                        this.icEmpty = true;
+                        this.icError = false;
+                    } else {
+                        const icPattern = /^\d{12}$/; // Exactly 12 digits, no hyphens, letters, or symbols
+            
+                        // Check if there are any letters or non-digit characters
+                        if (/[^0-9]/.test(ic)) {
+                            this.icError = true;
+                        } else if (!icPattern.test(ic)) {
+                            this.icError = true;
+                        } else {
+                            this.icError = false;
+                        }
+                        this.icEmpty = false;
+                    }
+                },
+                validateFon() {
+                    const fon = this.$refs.no_fon.value.trim();
+            
+                    // Reset all error states
+                    this.fonEmpty = false;
+                    this.fonError = false;
+                    this.fonInvalidChar = false;
+                    this.fonHasDash = false;
+                    this.fonTooShort = false;
+                    this.fonTooLong = false;
+            
+                    // Check if empty (required)
+                    if (!fon) {
+                        this.fonEmpty = true;
+                        return;
+                    }
+            
+                    // Check for letters (similar to the preg_match check)
+                    if (/[a-zA-Z]/.test(fon)) {
+                        this.fonInvalidChar = true;
+                        return;
+                    }
+            
+                    // Check for dashes (similar to strpos check)
+                    if (fon.includes('-')) {
+                        this.fonHasDash = true;
+                        return;
+                    }
+            
+                    // Check regex (only numbers allowed now)
+                    if (!/^[0-9]+$/.test(fon)) {
+                        this.fonError = true;
+                        return;
+                    }
+            
+                    // Check minimum length
+                    if (fon.length < 10) {
+                        this.fonTooShort = true;
+                        return;
+                    }
+                },
+            
+                validateForm() {
+                    this.validateName();
+                    this.validateIC();
+                    this.validateFon();
+                    this.validateResit();
+            
+                    return !(this.nameError || this.nameEmpty ||
+                        this.icError || this.icEmpty ||
+                        this.fonError || this.fonEmpty || this.fonInvalidChar || this.fonHasDash || this.fonTooShort ||
+                        this.resitError || this.fileSizeError || this.fileFormatError);
+                }
+            }" x-init="$watch('nameError', val => {
+                if (val) setTimeout(() => nameError = false, 3000);
+            });
+            $watch('nameEmpty', val => {
+                if (val) setTimeout(() => nameEmpty = false, 3000);
+            });
+            $watch('icError', val => {
+                if (val) setTimeout(() => icError = false, 3000);
+            });
+            $watch('icEmpty', val => {
+                if (val) setTimeout(() => icEmpty = false, 3000);
+            });
+            $watch('fonError', val => {
+                if (val) setTimeout(() => fonError = false, 3000);
+            });
+            $watch('fonEmpty', val => {
+                if (val) setTimeout(() => fonEmpty = false, 3000);
+            });
+            $watch('fonTooShort', val => {
+                if (val) setTimeout(() => fonTooShort = false, 3000);
+            });
+            $watch('fonInvalidChar', val => {
+                if (val) setTimeout(() => fonInvalidChar = false, 3000);
+            });
+            $watch('fonHasDash', val => {
+                if (val) setTimeout(() => fonHasDash = false, 3000);
+            });
+            $watch('resitError', val => {
+                if (val) setTimeout(() => resitError = false, 3000);
+            });
+            $watch('fileSizeError', val => {
+                if (val) setTimeout(() => fileSizeError = false, 3000);
+            });
+            $watch('fileFormatError', val => {
+                if (val) setTimeout(() => fileFormatError = false, 3000);
+            });">
+                <form id="myForm" method="POST" action="{{ route('player.store') }}" enctype="multipart/form-data"
+                    @submit.prevent="validateForm() ? $el.submit() : null">
                     @csrf
                     <div class="form-group">
                         <label><span>Nama Penuh</span> (Full Name)</label>
                         <div class="input-container">
                             <input type="text" class="form-input" id="fullName" name="nama"
-                                placeholder="Aisyah binti Ahmad" value="{{ old('nama') }}">
-                            <x-validation-error field="nama" />
+                                placeholder="Aisyah binti Ahmad" value="{{ old('nama') }}" x-ref="nama"
+                                @blur="validateName()">
+
+                            <x-validation-error field="nama" x-show="nameEmpty">
+                                Sila isi ruangan ini.
+                            </x-validation-error>
+
+                            <x-validation-error field="nama" x-show="nameError">
+                                Sila gunakan huruf sahaja.
+                            </x-validation-error>
+
                             <img src="/assets/img/snack1.1.png" class="snack-1">
                             <img src="/assets/img/snack1-desktop.png" class="snack1-desktop">
                         </div>
@@ -921,16 +1135,42 @@
                     <div class="form-group">
                         <label><span>Nombor Telefon</span> (Phone Number)</label>
                         <input type="tel" class="form-input" id="phoneNumber" name="no_fon" maxlength="11"
-                            placeholder="012-3456789" value="{{ old('no_fon') }}">
-                        <x-validation-error field="no_fon" />
+                            placeholder="0123456789" value="{{ old('no_fon') }}" x-ref="no_fon" @blur="validateFon()">
+
+                        <x-validation-error field="no_fon" x-show="fonEmpty">
+                            Sila isi ruangan ini.
+                        </x-validation-error>
+
+                        <x-validation-error field="no_fon" x-show="fonError">
+                            Sila gunakan format nombor telefon yang sah, cth: 012.
+                        </x-validation-error>
+
+                        <x-validation-error field="no_fon" x-show="fonTooShort">
+                            Nombor telefon terlalu pendek.
+                        </x-validation-error>
+
+                        <x-validation-error field="no_fon" x-show="fonInvalidChar">
+                            Sila gunakan nombor sahaja.
+                        </x-validation-error>
+                        
+                        <x-validation-error field="no_fon" x-show="fonHasDash">
+                            Sila gunakan nombor telefon yang sah tanpa tanda (-).
+                        </x-validation-error>
                     </div>
 
                     <div class="form-group">
                         <label id="icNumberLabel"><span>Nombor Kad Pengenalan (IC)</span>
                             (Identification Card Number)</label>
                         <input type="text" id="icNumber" class="form-input" name="no_ic" maxlength="12"
-                            placeholder="123456789123" value="{{ old('no_ic') }}">
-                        <x-validation-error field="no_ic" />
+                            placeholder="123456789123" value="{{ old('no_ic') }}" x-ref="no_ic" @blur="validateIC()">
+
+                        <x-validation-error field="no_ic" id="icErrorField" x-show="icEmpty">
+                            Sila isi ruangan ini.
+                        </x-validation-error>
+
+                        <x-validation-error field="no_ic" id="icErrorField" x-show="icError">
+                            Sila gunakan format nombor IC yang sah (12 digit nombor sahaja).
+                        </x-validation-error>
                     </div>
 
                     <div class="receipt-section">
@@ -948,18 +1188,37 @@
                                 <input type="file" id="fileUpload" name="receipt" class="upload-btn"
                                     accept=".jpg, .jpeg, .png, .pdf"
                                     title="Please attach your receipt. Sila lampirkan resit anda."
-                                    style="display: none;">
+                                    style="display: none;" x-ref="fileUpload" @change="validateResit()">
                             </div>
 
                             <label for="fileUpload" class="custom-upload-btn">
                                 <img src="/assets/img/uploadicon.png" alt="Upload" class="custom-upload-icon">
                             </label>
 
-                            <div class="file-info" id="fileInfo">
-                                <span class="file-name" id="fileName"></span> <br>
-                                <span class="file-size" id="fileSize"></span>
+                            <div class="file-info" id="fileInfo" x-show="fileName !== ''">
+                                <span class="file-name" x-text="fileName"></span> <br>
+                                <span class="file-size" x-text="fileSize"></span>
                             </div>
-                            <x-validation-error field="receipt" />
+
+                            <x-validation-error field="receipt" x-show="resitError">
+                                Sila muat naik resit pembelian anda.
+                            </x-validation-error>
+
+                            <x-validation-error field="receipt" x-show="fileSizeError">
+                                Fail terlalu besar. Sila muat naik fail kurang daripada 1MB.
+                            </x-validation-error>
+
+                            <x-validation-error field="receipt" x-show="fileFormatError">
+                                Sila ikut format yang diminta.
+                            </x-validation-error>
+
+                            <div class="success-popup" x-show="fileUploaded"
+                                x-transition:enter="transition ease-out duration-300"
+                                x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                                x-transition:leave="transition ease-in duration-300"
+                                x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+                                Fail berjaya dimuat naik!
+                            </div>
                         </div>
                     </div>
 

@@ -1,23 +1,6 @@
-@props(['field'])
-
-@error($field)
-    <div class="error-popup" style="display: block;" id="error-{{ $field }}">
-        {{ $message }}
-    </div>
-    
-    <script>
-        setTimeout(() => {
-            const errorElement = document.getElementById('error-{{ $field }}');
-            errorElement.style.opacity = '1'; // Ensure it's visible
-            
-            // Start fade out
-            errorElement.style.transition = 'opacity 0.5s ease';
-            errorElement.style.opacity = '0';
-            
-            // Remove after animation
-            setTimeout(() => {
-                errorElement.style.display = 'none';
-            }, 500);
-        }, 3000);
-    </script>
-@enderror
+<div id="error-{{ $field ?? 'field' }}" class="error-popup" {{ $attributes }}
+    x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+    x-transition:enter-end="opacity-100" x-transition:leave="transition ease-in duration-300"
+    x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0">
+    {{ $slot }}
+</div>

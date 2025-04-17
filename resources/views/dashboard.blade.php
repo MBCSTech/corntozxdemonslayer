@@ -70,7 +70,6 @@
                     <div class="flex justify-end mb-4 gap-4">
                         <div class="custom-dropdown">
                             <button type="button"
-                                onclick="downloadAllImages()"
                                 class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-500 active:bg-green-600 focus:outline-none focus:border-green-600 focus:ring ring-green-300 disabled:opacity-25 transition ease-in-out duration-150">
                                 {{ __('Download Receipt') }}
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" viewBox="0 0 20 20"
@@ -82,28 +81,28 @@
                             </button>
                             <div class="custom-dropdown-content">
                                 <button onclick="downloadAllImages('Week1')" class="dropdown-item">
-                                    {{ __('Week 1') }}
+                                    {{ __('Week 1: 1/6-8/6') }}
                                 </button>
                                 <button onclick="downloadAllImages('Week2')" class="dropdown-item">
-                                    {{ __('Week 2') }}
+                                    {{ __('Week 2: 9/6-15/6') }}
                                 </button>
                                 <button onclick="downloadAllImages('Week3')" class="dropdown-item">
-                                    {{ __('Week 3') }}
+                                    {{ __('Week 3: 16/6-22/6') }}
                                 </button>
                                 <button onclick="downloadAllImages('Week4')" class="dropdown-item">
-                                    {{ __('Week 4') }}
+                                    {{ __('Week 4: 23/6-29/6') }}
                                 </button>
-                                <button onclick="downloadAllImages('Week4')" class="dropdown-item">
-                                    {{ __('Week 5') }}
+                                <button onclick="downloadAllImages('Week5')" class="dropdown-item">
+                                    {{ __('Week 5: 30/6-6/7') }}
                                 </button>
-                                <button onclick="downloadAllImages('Week4')" class="dropdown-item">
-                                    {{ __('Week 6') }}
+                                <button onclick="downloadAllImages('Week6')" class="dropdown-item">
+                                    {{ __('Week 6: 7/7-13/7') }}
                                 </button>
-                                <button onclick="downloadAllImages('Week4')" class="dropdown-item">
-                                    {{ __('Week 7') }}
+                                <button onclick="downloadAllImages('Week7')" class="dropdown-item">
+                                    {{ __('Week 7: 14/7-20/7') }}
                                 </button>
-                                <button onclick="downloadAllImages('Week4')" class="dropdown-item">
-                                    {{ __('Week 8') }}
+                                <button onclick="downloadAllImages('Week8')" class="dropdown-item">
+                                    {{ __('Week 8: 21/7-31/7') }}
                                 </button>
                             </div>
                         </div>
@@ -404,7 +403,7 @@
 
             // Fetch the list of images with puzzle version filter
             const url =
-                `{{ route('dashboard') }}?start_date=${startDate}&end_date=${endDate}&puzzle_version=${week}&export=1`;
+                `{{ route('dashboard') }}?start_date=${startDate}&end_date=${endDate}&week=${week}&export=1`;
             const response = await fetch(url);
 
             if (!response.ok) {
@@ -412,15 +411,19 @@
             }
 
             const users = await response.json();
+            console.log(users);
+            
 
             if (users.length === 0) {
-                throw new Error('No receipts found for the selected puzzle version and date range.');
+                throw new Error('No receipts found for the selected week and date range.');
             }
 
             const zip = new JSZip();
             let processedFiles = 0;
             const totalFiles = users.filter(user => user.Receipt_Name).length;
-
+            console.log(totalFiles);
+            
+            
             for (const user of users) {
                 if (user.Receipt_Name) {
                     const fileExtension = user.Receipt_Name.split('.').pop().toLowerCase();
@@ -432,7 +435,7 @@
                             if (!fileResponse.ok) continue;
 
                             const fileBlob = await fileResponse.blob();
-                            const fileName = `${user['User ID']}_${week}_resit.${fileExtension}`;
+                            const fileName = `${user.id||user['User ID']}_resit.${fileExtension}`;
                             zip.file(fileName, fileBlob);
 
                             processedFiles++;
