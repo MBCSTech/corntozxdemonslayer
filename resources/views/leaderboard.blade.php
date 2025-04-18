@@ -144,10 +144,47 @@
 
         /* Responsive adjustments */
 
-        @media (min-width: 375px) {
+        @media (min-width: 350px) {
             .leaderboard-entries {
                 top: 56%;
+                gap: 0.5rem;
+            }
+        }
+
+        @media (min-width: 375px) {
+            .leaderboard-entries {
                 gap: 0.6rem;
+            }
+        }
+
+
+        @media (min-width: 420px) {
+            .leaderboard-entries {
+                gap: 0.8rem;
+            }
+        }
+
+        @media (min-width: 475px) {
+            .leaderboard-entries {
+                gap: 1rem;
+            }
+        }
+
+        @media (min-width: 495px) {
+            .leaderboard-entries {
+                gap: 1.2rem;
+            }
+        }
+
+        @media (min-width: 540px) {
+            .leaderboard-entries {
+                gap: 1.5rem;
+            }
+        }
+
+        @media (min-width: 628px) {
+            .leaderboard-entries {
+                gap: 1.8rem;
             }
         }
 
@@ -169,6 +206,12 @@
                 gap: 1.25rem;
             }
 
+        }
+
+        @media (min-width: 865px) {
+            .leaderboard-entries {
+                gap: 1.5rem;
+            }
         }
 
         @media (min-width: 900px) {
@@ -200,17 +243,17 @@
             }
         }
 
-        @media (min-width: 1280px) {
+        @media (min-width: 1220px) {
             .leaderboard-entries {
                 gap: 1.5rem;
             }
 
-            .score-text{
+            .score-text {
                 transform: translate(66px, 14%)
             }
         }
 
-        @media (min-width: 1440px) {
+        @media (min-width: 1350px) {
             .leaderboard-entries {
                 gap: 2rem;
             }
@@ -268,7 +311,7 @@
 
         <div class="buttons">
             <div class="restart-button">
-                <a href="/game"><img src="/assets/restart-button.png"></a>
+                <a href="/intro"><img src="/assets/restart-button.png"></a>
             </div>
             <div class="proceed-button">
                 <a href="/form-submission"><img src="/assets/proceed-button.png"></a>

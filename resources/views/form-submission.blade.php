@@ -292,7 +292,6 @@
             background-color: #f0f0f0;
             padding: 8px 16px;
             border-radius: 15px;
-            display: none;
             word-break: break-all;
         }
 
@@ -947,8 +946,8 @@
                         return;
                     }
             
-                    // Check file size - changed to 1MB (1048576 bytes)
-                    if (file.size > 1048576) {
+                    // Check file size - changed to 2MB (2097152 bytes)
+                    if (file.size > 2097152) {
                         this.fileSizeError = true;
                         this.resitError = true;
                         this.fileFormatError = false;
@@ -1195,9 +1194,9 @@
                                 <img src="/assets/img/uploadicon.png" alt="Upload" class="custom-upload-icon">
                             </label>
 
-                            <div class="file-info" id="fileInfo" x-show="fileName !== ''">
-                                <span class="file-name" x-text="fileName"></span> <br>
-                                <span class="file-size" x-text="fileSize"></span>
+                            <div class="file-info" id="fileInfo" x-show="fileName !== ''" style="display: none;">
+                                <span class="file-name" id="fileName" x-text="fileName"></span> <br>
+                                <span class="file-size" id="fileSize" x-text="fileSize"></span>
                             </div>
 
                             <x-validation-error field="receipt" x-show="resitError">
@@ -1205,7 +1204,7 @@
                             </x-validation-error>
 
                             <x-validation-error field="receipt" x-show="fileSizeError">
-                                Fail terlalu besar. Sila muat naik fail kurang daripada 1MB.
+                                Fail terlalu besar. Sila muat naik fail kurang daripada 2MB.
                             </x-validation-error>
 
                             <x-validation-error field="receipt" x-show="fileFormatError">

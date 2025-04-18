@@ -540,45 +540,45 @@
                 );
 
                 // Show level up notification
-                this.showLevelUpNotification();
+                // this.showLevelUpNotification();
 
                 // Play level up sound
-                if (this.sound.get('levelup')) {
-                    this.sound.play("levelup", {
-                        volume: 0.5
-                    });
-                }
+                // if (this.sound.get('levelup')) {
+                //     this.sound.play("levelup", {
+                //         volume: 0.5
+                //     });
+                // }
             }
 
-            showLevelUpNotification() {
-                // Update level text
-                this.levelText.setText("LEVEL " + this.difficultyLevel)
-                    .setAlpha(0)
-                    .setScale(0.5);
+            // showLevelUpNotification() {
+            //     // Update level text
+            //     this.levelText.setText("LEVEL " + this.difficultyLevel)
+            //         .setAlpha(0)
+            //         .setScale(0.5);
 
-                // Animate level up notification
-                this.tweens.add({
-                    targets: this.levelText,
-                    alpha: 1,
-                    scale: 1.2,
-                    duration: 500,
-                    ease: 'Back.easeOut',
-                    onComplete: () => {
-                        this.tweens.add({
-                            targets: this.levelText,
-                            alpha: 0,
-                            y: '+=20',
-                            duration: 800,
-                            delay: 800,
-                            ease: 'Power2',
-                            onComplete: () => {
-                                this.levelText.y -=
-                                    20; // Reset position for next notification
-                            }
-                        });
-                    }
-                });
-            }
+            //     // Animate level up notification
+            //     this.tweens.add({
+            //         targets: this.levelText,
+            //         alpha: 1,
+            //         scale: 1.2,
+            //         duration: 500,
+            //         ease: 'Back.easeOut',
+            //         onComplete: () => {
+            //             this.tweens.add({
+            //                 targets: this.levelText,
+            //                 alpha: 0,
+            //                 y: '+=20',
+            //                 duration: 800,
+            //                 delay: 800,
+            //                 ease: 'Power2',
+            //                 onComplete: () => {
+            //                     this.levelText.y -=
+            //                         20; // Reset position for next notification
+            //                 }
+            //             });
+            //         }
+            //     });
+            // }
 
             spawnObjects() {
                 // Check if we should spawn more objects based on limits
@@ -723,6 +723,7 @@
                 const message = reason === 'bomb' ? "ADUH! KENA BOM!" : "MASA TAMAT!";
                 const textColor = reason === 'bomb' ? "#FF3030" : "#FF6FAC"; // Red for bomb, pink for timeout
 
+                /* Uncomment if you want to show the end text
                 // Create the end text
                 const endText = this.add.text(240, 400, message, {
                         fontFamily: "PoppinsExtraBold",
@@ -746,6 +747,7 @@
                     .setOrigin(0.5)
                     .setDepth(2001)
                     .setAlpha(0);
+                */
 
                 // Create animation sequence
                 this.tweens.add({
@@ -754,104 +756,36 @@
                     duration: 300,
                     ease: 'Power2',
                     onComplete: () => {
-                        // Animate the text appearance
-                        this.tweens.add({
-                            targets: endText,
-                            alpha: 1,
-                            scale: 1.2,
-                            duration: 400,
-                            ease: 'Back.easeOut',
-                            onComplete: () => {
-                                // Add a slight bounce effect
-                                this.tweens.add({
-                                    targets: endText,
-                                    scale: 1,
-                                    duration: 200,
-                                    ease: 'Bounce.easeOut',
-                                    onComplete: () => {
-                                        // Show stats
-                                        this.tweens.add({
-                                            targets: statsText,
-                                            alpha: 1,
-                                            y: 480,
-                                            duration: 300,
-                                            ease: 'Power2',
-                                            onComplete: () => {
-                                                // Hold for a moment before transitioning
-                                                this.time
-                                                    .delayedCall(
-                                                        1500,
-                                                        () => {
-                                                            // Fade out
-                                                            this.cameras
-                                                                .main
-                                                                .fadeOut(
-                                                                    250,
-                                                                    0,
-                                                                    0,
-                                                                    0
-                                                                );
-                                                            this.cameras
-                                                                .main
-                                                                .once(
-                                                                    Phaser
-                                                                    .Cameras
-                                                                    .Scene2D
-                                                                    .Events
-                                                                    .FADE_OUT_COMPLETE,
-                                                                    () => {
-                                                                        // Send the score to Laravel backend using fetch
-                                                                        fetch
-                                                                            ('/save-score', {
-                                                                                method: 'POST',
-                                                                                headers: {
-                                                                                    'Content-Type': 'application/json',
-                                                                                    'X-CSRF-TOKEN': document
-                                                                                        .querySelector(
-                                                                                            'meta[name="csrf-token"]'
-                                                                                        )
-                                                                                        .getAttribute(
-                                                                                            'content'
-                                                                                        )
-                                                                                },
-                                                                                body: JSON
-                                                                                    .stringify({
-                                                                                        score: score,
-                                                                                        level: this
-                                                                                            .difficultyLevel
-                                                                                    })
-                                                                            })
-                                                                            .then(
-                                                                                response => {
-                                                                                    // Redirect to leaderboard page after storing in session
-                                                                                    window
-                                                                                        .location
-                                                                                        .href =
-                                                                                        "/leaderboard";
-                                                                                }
-                                                                            )
-                                                                            .catch(
-                                                                                error => {
-                                                                                    console
-                                                                                        .error(
-                                                                                            'Error saving score:',
-                                                                                            error
-                                                                                        );
-                                                                                    // Still redirect even if there was an error
-                                                                                    window
-                                                                                        .location
-                                                                                        .href =
-                                                                                        "/leaderboard";
-                                                                                }
-                                                                            );
-                                                                    }
-                                                                );
-                                                        });
-                                            }
+                        // Hold for a moment before transitioning
+                        this.time.delayedCall(1500, () => {
+                            // Fade out
+                            this.cameras.main.fadeOut(250, 0, 0, 0);
+                            this.cameras.main.once(Phaser.Cameras.Scene2D.Events
+                                .FADE_OUT_COMPLETE, () => {
+                                    // Send the score to Laravel backend using fetch
+                                    fetch('/save-score', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'X-CSRF-TOKEN': document.querySelector(
+                                                        'meta[name="csrf-token"]')
+                                                    .getAttribute('content')
+                                            },
+                                            body: JSON.stringify({
+                                                score: score,
+                                                level: this.difficultyLevel
+                                            })
+                                        })
+                                        .then(response => {
+                                            // Redirect to leaderboard page after storing in session
+                                            window.location.href = "/leaderboard";
+                                        })
+                                        .catch(error => {
+                                            console.error('Error saving score:', error);
+                                            // Still redirect even if there was an error
+                                            window.location.href = "/leaderboard";
                                         });
-                                    }
                                 });
-                            }
                         });
                     }
                 });

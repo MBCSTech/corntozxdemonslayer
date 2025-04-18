@@ -1,5 +1,4 @@
 <style>
-
     .navbars input[type="checkbox"],
     .navbars .hamburger-lines {
         display: none;
@@ -19,9 +18,9 @@
         z-index: 100;
     }
 
-    .navbars a{
+    .navbars a {
         font-family: 'PoppinsBlack', sans-serif;
-        
+
     }
 
     .navbar-container {
@@ -264,9 +263,15 @@
             <span class="line line3"></span>
         </div>
         <ul class="menu-items">
-            <li><a href="#"><img class="navbar-icons" src='/assets/img/info-logo.png' />TENTANG CORNTOZ</a></li>
-            <li><a href="/intro"><img class="navbar-icons" src='/assets/img/pen-logo.png' />MAIN SEKARANG</a></li>
-            <li><a href="#"><img class="navbar-icons" src='/assets/img/file-logo.png' />TERMA & SYARAT</a></li>
+            @if (Route::currentRouteName() == 'home')
+                <li><a href="/intro"><img class="navbar-icons" src='/assets/img/pen-logo.png' />MAIN SEKARANG</a></li>
+                <li><a href="#"><img class="navbar-icons" src='/assets/img/info-logo.png' />TENTANG CORNTOZ</a></li>
+                <li><a href="#"><img class="navbar-icons" src='/assets/img/file-logo.png' />TERMA & SYARAT</a></li>
+            @else
+                <li><a href="{{ route('home') }}"><img class="navbar-icons" src='/assets/img/home.png' />HALAMAN UTAMA</a></li>
+                <li><a href="#"><img class="navbar-icons" src='/assets/img/info-logo.png' />TENTANG CORNTOZ</a></li>
+                <li><a href="#"><img class="navbar-icons" src='/assets/img/file-logo.png' />TERMA & SYARAT</a></li>
+            @endif
         </ul>
         <img src="/assets/img/navbar-logo.png" class="logo" />
     </div>

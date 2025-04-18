@@ -10,7 +10,8 @@
             background-image: url('/assets/bg.png');
             background-size: cover;
             align-items: center;
-            gap: .5rem
+            gap: .5rem;
+            overflow: hidden;
         }
 
         .masthead {
